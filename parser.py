@@ -27,13 +27,16 @@ class Body(object):
 		self.glyph_list.append(glyph)
 
 def lookup_and_substitute(word, set):
+	# we need to split our list into substrings and work on those.
+	
 	for master, value in set.iteritems():
 		pattern = re.compile(master)
-		matches = re.finditer(pattern, word)
-		word = list(word)
+		matches = pattern.finditer(word)
+		working_word = list(word)
 		for match in matches:
-			word[match.span()[0]:match.span()[1]] = []
-			word.insert(match.span[0]+1, Glyph(value))
+			working_word[match.span()[0]:match.span()[1]] = []
+			working_word.insert(match.span()[0]+1, Glyph(value))
+	return working_word
 			
 def abbreviate(word):
 	"""
@@ -51,14 +54,11 @@ def abbreviate(word):
 	if word in ABB_SET.WORDS:
 		return Glyph(ABB_SET.WORDS[word])
 	
-	# for in-word substitutions we need to convert the word to a list
-	#else:
-	#	for trigraph, value in ABB_SET.TRIGRAPHS.iteritems():
-	#		pattern = re.compile(trigraph)
-	#		word = re.sub(pattern, value, word)	
 	else:
-		lookup_and_substitute(word, ABB_SET.TRIGRAPHS)
-	
+		
+		word = lookup_and_substitute(word, ABB_SET.TRIGRAPHS)
+		#word = lookup_and_substitute(word, ABB_SET.DIGRAPHS)
+		
 	return word
 		
 def parse(text):
