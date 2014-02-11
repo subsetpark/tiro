@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import re
 import ABB_SET
 
@@ -12,6 +15,8 @@ class Glyph(object):
 	def __repr__(self):
 		return self.name
 		
+	def __unicode__(self):
+		return self.name
 		
 class Body(object):
 	"""
@@ -26,26 +31,13 @@ class Body(object):
 	def append(self, glyph):
 		self.glyph_list.append(glyph)
 
-def word_manager(word, func):
-	substring = []
-	subword = False
-	for position in word:
-		# souRCE
-		if isinstance(position, str) and not subword:
-			sublist.append(position)
-		# CHapter
-		elif not isinstance(position, str) and not sublist:
-			continue
-		elif not instance(position, str) and sublist:
-			subword = str(sublist)
-			return lookup_and_substitute(word, set)
-
 def separate_strings_and_symbols(token_list):
 	"""
 	
 	>>> separate_strings_and_symbols(['a', 'b', Glyph('RCE'), 'h'])
 	(['ab', 'h'], [RCE])
-	
+	>>> separate_strings_and_symbols([Glyph('RCE'), 'a', 'b'])
+	(['ab'], [RCE])
 	"""
 	
 	
@@ -77,44 +69,63 @@ def substitute_trigraphs(word):
 def substitute_digraphs(word):
 	return lookup_and_substitute(word, ABB_SET.DIGRAPHS)
 	
-def lookup_and_substitute(word, set):
-	for master, value in set.iteritems():
+def lookup_and_substitute(word, pattern_set):
+	"""
+	Given a dictionary and a word to work on, search through that dictionary
+	and replace all occurances of matching patterns with glyphs.
+	
+	>>> lookup_and_substitute('and', ABB_SET.WORDS)
+	[AND]
+	
+	>>> lookup_and_substitute('source', ABB_SET.TRIGRAPHS)
+	['s', 'o', 'u', RCE]
+	"""
+	
+	for master, value in pattern_set.iteritems():
 		pattern = re.compile(master)
 		matches = pattern.finditer(word)
 		working_word = list(word)
+		# Bug: if the sequence is the only thing in the string, the string gets wiped out.
+		# Bug: if the sequence is the first part of the string, it's off by one.
 		for match in matches:
 			working_word[match.span()[0]:match.span()[1]] = []
+			print working_word	
 			working_word.insert(match.span()[0]+1, Glyph(value))
+	print working_word
 	return working_word
 			
 def abbreviate(word):
 	"""
-	Looks up a word in the abbreviation set, then looks up its characters
+	Runs for_each_string on a given word with a given set of abbreviations.
 	
 	>>> abbreviate("the")
 	THE
 	
-	>> abbreviate("dijkstra")
-	None
+	>>> abbreviate("dijkstra")
+	['d', 'i', 'j', 'k', 's', 't', 'r', 'a']
+	
+	>>> abbreviate("rcender")
+	[RCE, 'n', 'd', 'e', 'r']
 	
 	>>> abbreviate("source")
 	['s', 'o', 'u', RCE]
+	
+	>>> abbreviate("and")
 	"""
 	# return a full-word substitute
 	# TODO: Short-circuit full words
 	#if word in ABB_SET.WORDS:
 	#	return Glyph(ABB_SET.WORDS[word])
 	
-	else:
 		# We could put this into a loop that goes through dictionary sets
-		result = for_each_string(list(word), 
-								lambda x: lookup_and_substitute(x, ABB_SET.WORDS))	
-		result = for_each_string(list(word), 
-								lambda x: lookup_and_substitute(x, ABB_SET.TRIGRAPHS))
-		result = for_each_string(list(word), 
-								lambda x: lookup_and_substitute(x, ABB_SET.DIGRAPHS))		
-	return word
-		
+	result = for_each_string((word), 
+							lambda x: lookup_and_substitute(x, ABB_SET.WORDS))	
+	result = for_each_string((result), 
+							lambda x: lookup_and_substitute(x, ABB_SET.TRIGRAPHS))
+	result = for_each_string((result), 
+							lambda x: lookup_and_substitute(x, ABB_SET.DIGRAPHS))		
+	return result if result else word
+			
 def parse(text):
 	words = text.split()
 	map(abbreviate, words)
@@ -123,6 +134,8 @@ def parse(text):
 	
 if __name__ == '__main__':
 	import doctest
-	doctest.testmod()
+	#doctest.testmod()
 	
 	#abbreviate("source")
+	abbreviate("and")
+	abbreviate("rcet")

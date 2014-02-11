@@ -1,12 +1,15 @@
-WORDS = {'the':'THE',
-		'and': 'AND',
-		'with': 'WITH',
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+WORDS = {u'the':'THE',
+		u'and': 'AND',
+		u'with': 'WITH',
 		}
 	
-DIGRAPHS = {'th':'TH',
-		'ch':'CH'
+DIGRAPHS = {u'th':'TH',
+		u'ch':'CH'
 		}
 		
-TRIGRAPHS = {'rse':'RSE',
-		'rce':'RCE'
+TRIGRAPHS = {u'rse':'RSE',
+		u'rce':'RCE'
 		}
