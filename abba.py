@@ -38,18 +38,28 @@ class Abbreviation_dictionary(object):
 	u'\ue000 sou\ue004'
 	
 	"""
+	
+	def add_to_lookup(self, abbreviation):
+		self.lookup_table[abbreviation.codepoint] = abbreviation.name
+		
+	def lookup(self, char):
+		return self.lookup_table[char]
+	
 	def add_sequence(self, set_sequence):
 		new_sequence = []
 		# construct a list of all abbreviation in a given set,
 		# then append them to the list of all sequences.
 		for pattern in set_sequence:
 			# create the pattern here.
-			new_sequence.append(Abbreviation(pattern, self.serial))
+			new_abbreviation = Abbreviation(pattern, self.serial)
+			new_sequence.append(new_abbreviation)
+			self.add_to_lookup(new_abbreviation)
 			self.serial += 1
 		self.abb_sequences.append(new_sequence)
 	
 	def __init__(self, *set_sequences):
 		self.abb_sequences = []
+		self.lookup_table = {}
 		# begin creating unicode characters at the beginning 
 		# of the private use space
 		self.serial = 57344
@@ -68,6 +78,19 @@ class Abbreviation_dictionary(object):
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
 
+	def decode(self, text):
+		"""
+		Takes abbreviated text with unicode entities and renders them in ASCII (or whatever.)
+		"""
+		working_text = list(text)
+		render = ""
+		for index, char in enumerate(working_text):
+			if ord(char) >= 57344:
+				render += self.lookup(char)
+			else:
+				render += char
+	
+		return render
 	
 if __name__ == "__main__":
 	import doctest
@@ -78,4 +101,4 @@ if __name__ == "__main__":
 	words = text.split()
 	abba = Abbreviation_dictionary(ABB_SET.WORDS, ABB_SET.TRIGRAPHS, ABB_SET.DIGRAPHS)
 	
-	print abba.abbreviate_text(text)
+	print abba.decode(abba.abbreviate_text(text))
