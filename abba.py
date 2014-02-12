@@ -12,14 +12,25 @@ class Abbreviation(object):
 	"""
 	def __init__(self, abb_data, serial):
 		self.codepoint = unichr(serial)
-		self.pattern = abb_data[0]
-		self.name = abb_data[1]
-		
+		self.pattern = abb_data['pattern']
+		self.name = abb_data['name']
+		if abb_data['uni_rep']:
+			self.uni_rep = abb_data['uni_rep']
+		else:
+			self.uni_rep = ''
+	
+	def uni_report(self):
+		if self.uni_rep:
+			return self.uni_rep	
+		else:
+			return None
+			
 	def __repr__(self):
 		return self.name
 	
 	def __unicode__(self):
 		return self.codepoint
+	
 	
 			
 class Abbreviation_dictionary(object):
@@ -36,15 +47,19 @@ class Abbreviation_dictionary(object):
 	u'sou\ue004'
 	>>> abba.abbreviate_text("the source")
 	u'\ue000 sou\ue004'
-	
+	>>> print abba.uni_lookup(u'\ue000')
+	∂
 	"""
 	
 	def add_to_lookup(self, abbreviation):
-		self.lookup_table[abbreviation.codepoint] = abbreviation.name
+		self.lookup_table[abbreviation.codepoint] = abbreviation
 		
 	def lookup(self, char):
-		return self.lookup_table[char]
-	
+		return self.lookup_table[char].name
+		
+	def uni_lookup(self, char):
+		return self.lookup_table[char].uni_report()
+		
 	def add_sequence(self, set_sequence):
 		new_sequence = []
 		# construct a list of all abbreviation in a given set,
@@ -69,7 +84,7 @@ class Abbreviation_dictionary(object):
 	def lookup_and_substitute(self, word, sequence):
 		working_word = word
 		for abbreviation in sequence:
-			working_word = re.sub(abbreviation.pattern, abbreviation.codepoint, working_word) 
+			working_word = re.sub(abbreviation.pattern, abbreviation.codepoint, working_word.lower()) 
 		return working_word	
 	
 	def abbreviate_text(self, text):
@@ -78,19 +93,34 @@ class Abbreviation_dictionary(object):
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
 
-	def decode(self, text):
-		"""
-		Takes abbreviated text with unicode entities and renders them in ASCII (or whatever.)
-		"""
-		working_text = list(text)
-		render = ""
-		for index, char in enumerate(working_text):
-			if ord(char) >= 57344:
-				render += self.lookup(char)
+def base_decode(text, abb_dict):
+	"""
+	Takes abbreviated text with unicode entities and renders them in ASCII 
+	"""
+	working_text = list(text)
+	render = ""
+	for index, char in enumerate(working_text):
+		if ord(char) >= 57344:
+			render += abb_dict.lookup(char)
+		else:
+			render += char
+	return render
+		
+def uni_decode(text, abb_dict):
+	"""
+	Takes abbreviated text with unicode entities and renders them in unicode (or whatever.)
+	"""
+	working_text = list(text)
+	render = u""
+	for char in working_text:
+		if ord(char) >= 57344:
+			if abb_dict.uni_lookup(char):
+				render += abb_dict.uni_lookup(char).decode('utf-8')
 			else:
-				render += char
-	
-		return render
+				render += abb_dict.lookup(char).decode('utf-8')
+		else:
+			render += char.decode('utf-8')
+	return render
 	
 if __name__ == "__main__":
 	import doctest
@@ -99,6 +129,7 @@ if __name__ == "__main__":
 	text = " ".join(sys.argv[1:])
 	
 	words = text.split()
-	abba = Abbreviation_dictionary(ABB_SET.WORDS, ABB_SET.TRIGRAPHS, ABB_SET.DIGRAPHS)
+	abba = Abbreviation_dictionary(ABB_SET.WORDS, ABB_SET.TRIGRAPHS, ABB_SET.DIGRAPHS, ABB_SET.SINGLETONS)
 	
-	print abba.decode(abba.abbreviate_text(text))
+	print base_decode(abba.abbreviate_text(text), abba)
+	print uni_decode(abba.abbreviate_text(text), abba)
