@@ -25,8 +25,6 @@ class Abbreviation(object):
 	
 	def __unicode__(self):
 		return self.codepoint
-	
-	
 			
 class Abbreviation_dictionary(object):
 	"""
@@ -102,7 +100,7 @@ def base_decode(text, abb_dict):
 		
 def uni_decode(text, abb_dict):
 	"""
-	Takes abbreviated text with unicode entities and renders them in unicode (or whatever.)
+	Takes abbreviated text with unicode entities and renders them in unicode 
 	"""
 	working_text = list(text)
 	render = u""
@@ -116,8 +114,6 @@ def uni_decode(text, abb_dict):
 			render += char
 	return render
 	
-
-
 
 if __name__ == "__main__":
 	import doctest
