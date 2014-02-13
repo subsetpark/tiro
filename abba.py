@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import re
-import json
+import sys, re, json, warnings
 
 class Abbreviation(object):
 	"""
@@ -134,9 +132,25 @@ if __name__ == "__main__":
 	import doctest
 	doctest.testmod()
 	
-	text = " ".join(sys.argv[1:])
+	import argparse
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--ruleset", help="""
+					The ruleset to use. Uses The New Abbreviations if
+					none is supplied.""")
+	parser.add_argument('-i', '--input-file', type=argparse.FileType('r'), default='-')
+	parser.add_argument('-t', '--text', nargs="+", help="""	The text to operate on.""")
 	
-	abb_set = load_rules("tna.json")
+	args = parser.parse_args()
+	
+	if not sys.stdin.isatty():
+		text = sys.stdin.read().strip("\r\n")
+	elif args.text:
+		text = " ".join(args.text)
+	else:
+		exit("No input received.")
+		
+	ruleset = args.ruleset or "tna.json"
+	abb_set = load_rules(ruleset)
 	abba = Abbreviation_dictionary(abb_set)
 	
 	print(uni_decode(abba.abbreviate_text(text), abba))
