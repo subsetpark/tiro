@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys, re, json, warnings, collections
-from abba_generator import generate_rules
+import sys, re, json, warnings
+from rules_generator import generate_rules
 
 class Abbreviation(object):
 	"""
