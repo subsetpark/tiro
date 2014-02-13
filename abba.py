@@ -136,20 +136,21 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--ruleset", help="""
 					The ruleset to use. Uses The New Abbreviations if
-					none is supplied.""")
-	parser.add_argument('-i', '--input-file', type=argparse.FileType('r'), default='-')
-	parser.add_argument('-t', '--text', nargs="+", help="""	The text to operate on.""")
-	
+					none is supplied.""", default="tna.json")
+	parser.add_argument('-i', '--infile', type=argparse.FileType('r'))
+	parser.add_argument('-t', '--text', nargs="+", help="""	The text to operate on.""")	
 	args = parser.parse_args()
 	
 	if not sys.stdin.isatty():
 		text = sys.stdin.read().strip("\r\n")
+	elif args.infile:
+		text = (args.infile).read()
 	elif args.text:
 		text = " ".join(args.text)
 	else:
-		exit("No input received.")
+		exit("No input received. Run 'python3 abba.py -h' for more information.")
 		
-	ruleset = args.ruleset or "tna.json"
+	ruleset = args.ruleset
 	abb_set = load_rules(ruleset)
 	abba = Abbreviation_dictionary(abb_set)
 	

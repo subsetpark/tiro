@@ -143,6 +143,11 @@
                 "uni_rep": "\u13d0"
             },
             {
+            		"name": "SH",
+            		"pattern": "sh",
+            		"uni_rep": "\u0283"
+            },
+            {
                 "name": "TERMINAL_ER",
                 "pattern": "er(?=\\b)|(?=\\b)er",
                 "uni_rep": "\u0119"
