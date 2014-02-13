@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys, re, json, warnings
+import sys, re, json, warnings, collections
+from abba_generator import generate_rules
 
 class Abbreviation(object):
 	"""
@@ -93,6 +94,8 @@ class Abbreviation_dictionary(object):
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
 
+
+	
 def load_rules(filename):
 	input = open(filename)
 	return json.load(input)
@@ -134,6 +137,8 @@ if __name__ == "__main__":
 	
 	import argparse
 	parser = argparse.ArgumentParser()
+	parser.add_argument('-g', '--generate', help="""
+	Analyze a text for frequency and generate abbreviations on the fly.""", action="store_true")
 	parser.add_argument("--ruleset", help="""
 					The ruleset to use. Uses The New Abbreviations if
 					none is supplied.""", default="tna.json")
@@ -151,7 +156,11 @@ if __name__ == "__main__":
 		exit("No input received. Run 'python3 abba.py -h' for more information.")
 		
 	ruleset = args.ruleset
-	abb_set = load_rules(ruleset)
+	
+	if args.generate:
+		abb_set = generate_rules(text)
+	else:
+		abb_set = load_rules(ruleset)
 	abba = Abbreviation_dictionary(abb_set)
 	
 	print(uni_decode(abba.abbreviate_text(text), abba))
