@@ -8,7 +8,7 @@ uSUB_E = '\u032F'
 uSUB_O = '\u0325'
 
 ABB_SET = [
-{ 'seq_name' : 'words',
+{ 'class' : 'words',
 'patterns' : [{'pattern':r'(?<=\b)the(?=\b)','name':'THE','uni_rep':uTH},
 		{'pattern':r'(?<=\b)this(?=\b)','name':'THIS','uni_rep':uTH+'s'},
 		{'pattern':r'(?<=\b)then(?=\b)','name':'THEN','uni_rep':uTH+'n'},
@@ -32,12 +32,12 @@ ABB_SET = [
 		{'pattern':r'(?<=\b)at(?=\b)','name':'AT','uni_rep':'@'},
 		]
 	},
-{ 'seq_name' : 'trigraphs',
+{ 'class' : 'trigraphs',
 'patterns' : [{'pattern':r'rse','name':'RSE','uni_rep':''},
 			{'pattern':r'rce','name':'RCE','uni_rep':''},
 		]
 	},
-{ 'seq_name' : 'digraphs',
+{ 'class' : 'digraphs',
 'patterns' : [{'pattern':r'th','name':'TH','uni_rep':uTH},
 			{'pattern':r'ch','name':'CH','uni_rep':'\u0256'},
 			{'pattern':r'ck','name':'CK','uni_rep':'\u13D0'},
@@ -58,7 +58,7 @@ ABB_SET = [
 			{'pattern':r'ss(?=\w)','name':'MEDIAL_SS','uni_rep':'\u00DF'},
 		]
 	},
-{ 'seq_name' : 'singletons',
+{ 'class' : 'singletons',
 'patterns' : [{'pattern':r's(?=\w)','name':'LONG_S','uni_rep':'\u017F'},
 				{'pattern':r'(?<=[bdhmnopquw])r',
 					'name':'R_ROTUNDA','uni_rep':uROT},

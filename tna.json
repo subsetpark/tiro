@@ -1,0 +1,232 @@
+[
+    {
+        "class": "words",
+        "patterns": [
+            {
+                "name": "THE",
+                "pattern": "(?<=\\b)the(?=\\b)",
+                "uni_rep": "\u00f0"
+            },
+            {
+                "name": "THIS",
+                "pattern": "(?<=\\b)this(?=\\b)",
+                "uni_rep": "\u00f0s"
+            },
+            {
+                "name": "THEN",
+                "pattern": "(?<=\\b)then(?=\\b)",
+                "uni_rep": "\u00f0n"
+            },
+            {
+                "name": "THAT",
+                "pattern": "(?<=\\b)that(?=\\b)",
+                "uni_rep": "\u00f0t"
+            },
+            {
+                "name": "THERE",
+                "pattern": "(?<=\\b)there(?=\\b)",
+                "uni_rep": "\u00f0r"
+            },
+            {
+                "name": "AND",
+                "pattern": "(?<=\\b)and(?=\\b)",
+                "uni_rep": "\u204a"
+            },
+            {
+                "name": "WITH",
+                "pattern": "(?<=\\b)with(?=\\b)",
+                "uni_rep": ""
+            },
+            {
+                "name": "CAN",
+                "pattern": "(?<=\\b)can",
+                "uni_rep": "\u00e7"
+            },
+            {
+                "name": "WE",
+                "pattern": "(?<=\\b)we(?=\\b)",
+                "uni_rep": "w\u0303"
+            },
+            {
+                "name": "ME",
+                "pattern": "(?<=\\b)me(?=\\b)",
+                "uni_rep": "m\u0303"
+            },
+            {
+                "name": "US",
+                "pattern": "(?<=\\b)us(?=\\b)",
+                "uni_rep": "\u0303"
+            },
+            {
+                "name": "IS",
+                "pattern": "(?<=\\b)is(?=\\b)",
+                "uni_rep": "\u01c2"
+            },
+            {
+                "name": "WHAT",
+                "pattern": "(?<=\\b)what(?=\\b)",
+                "uni_rep": "\u2c72t"
+            },
+            {
+                "name": "WHEN",
+                "pattern": "(?<=\\b)when(?=\\b)",
+                "uni_rep": "\u2c72n"
+            },
+            {
+                "name": "WHICH",
+                "pattern": "(?<=\\b)which(?=\\b)",
+                "uni_rep": "\u2c72c"
+            },
+            {
+                "name": "WHY",
+                "pattern": "(?<=\\b)why(?=\\b)",
+                "uni_rep": "\u2c72y"
+            },
+            {
+                "name": "WHERE",
+                "pattern": "(?<=\\b)where(?=\\b)",
+                "uni_rep": "\u2c72\ua75b"
+            },
+            {
+                "name": "YO",
+                "pattern": "(?<=\\b)you(?=\\b)",
+                "uni_rep": "\u1eff"
+            },
+            {
+                "name": "IN",
+                "pattern": "(?<=\\b)in",
+                "uni_rep": "\u0279"
+            },
+            {
+                "name": "TO",
+                "pattern": "to(?![aeiouywy])",
+                "uni_rep": "\u0167"
+            },
+            {
+                "name": "AT",
+                "pattern": "(?<=\\b)at(?=\\b)",
+                "uni_rep": "@"
+            }
+        ]
+    },
+    {
+        "class": "trigraphs",
+        "patterns": [
+            {
+                "name": "RSE",
+                "pattern": "rse",
+                "uni_rep": ""
+            },
+            {
+                "name": "RCE",
+                "pattern": "rce",
+                "uni_rep": ""
+            }
+        ]
+    },
+    {
+        "class": "digraphs",
+        "patterns": [
+            {
+                "name": "TH",
+                "pattern": "th",
+                "uni_rep": "\u00f0"
+            },
+            {
+                "name": "CH",
+                "pattern": "ch",
+                "uni_rep": "\u0256"
+            },
+            {
+                "name": "CK",
+                "pattern": "ck",
+                "uni_rep": "\u13d0"
+            },
+            {
+                "name": "TERMINAL_ER",
+                "pattern": "er(?=\\b)|(?=\\b)er",
+                "uni_rep": "\u0119"
+            },
+            {
+                "name": "MEDIAL_ER",
+                "pattern": "(?<=\\w)er(?=\\w)",
+                "uni_rep": "\u0a6d"
+            },
+            {
+                "name": "YOGH",
+                "pattern": "gh",
+                "uni_rep": "\u021d"
+            },
+            {
+                "name": "TERMINAL_ED",
+                "pattern": "ed(?=\\b)",
+                "uni_rep": "\u0333"
+            },
+            {
+                "name": "TERMINAL_LY",
+                "pattern": "ly(?=\\b)",
+                "uni_rep": "\u1dcf"
+            },
+            {
+                "name": "O_NK",
+                "pattern": "(?<=[aeiouy])nk",
+                "uni_rep": "\u0330"
+            },
+            {
+                "name": "O_NG",
+                "pattern": "(?<=[aeiouy])ng",
+                "uni_rep": "\u032b"
+            },
+            {
+                "name": "O_NT",
+                "pattern": "(?<=[aeiouy])nt",
+                "uni_rep": "\u0303"
+            },
+            {
+                "name": "O_ND",
+                "pattern": "(?<=[aeiouy])nd",
+                "uni_rep": "\u036b"
+            },
+            {
+                "name": "O_CT",
+                "pattern": "(?<=[aeiouy])ct",
+                "uni_rep": "\u0265"
+            },
+            {
+                "name": "OO",
+                "pattern": "oo",
+                "uni_rep": "o\u0325"
+            },
+            {
+                "name": "LL",
+                "pattern": "ll",
+                "uni_rep": "\u2016"
+            },
+            {
+                "name": "MEDIAL_SS",
+                "pattern": "ss(?=\\w)",
+                "uni_rep": "\u00df"
+            }
+        ]
+    },
+    {
+        "class": "singletons",
+        "patterns": [
+            {
+                "name": "LONG_S",
+                "pattern": "s(?=\\w)",
+                "uni_rep": "\u017f"
+            },
+            {
+                "name": "R_ROTUNDA",
+                "pattern": "(?<=[bdhmnopquw])r",
+                "uni_rep": "\ua75b"
+            },
+            {
+                "name": "TERMINAL_E",
+                "pattern": "(?<=\\w)e(?=(\\b|s))",
+                "uni_rep": "\u032f"
+            }
+        ]
+    }
+]

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import ABB_SET
 import sys
 import re
+import json
 
 class Abbreviation(object):
 	"""
@@ -77,7 +77,8 @@ class Abbreviation_dictionary(object):
 		"""
 		Runs each sequence of transforms in the order they were loaded into the
 		controller.
-		>>> abba = Abbreviation_dictionary(ABB_SET.ABB_SET)
+		>>> abb_set = load_rules("tna.json")
+		>>> abba = Abbreviation_dictionary(abb_set)
 		>>> print(uni_decode(abba.abbreviate_text("this"), abba))
 		ðs
 		>>> print(uni_decode(abba.abbreviate_text("we are cömbined"), abba))
@@ -94,6 +95,9 @@ class Abbreviation_dictionary(object):
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
 
+def load_rules(filename):
+	input = open(filename)
+	return json.load(input)
 
 def base_decode(text, abb_dict):
 	"""
@@ -132,6 +136,7 @@ if __name__ == "__main__":
 	
 	text = " ".join(sys.argv[1:])
 	
-	abba = Abbreviation_dictionary(ABB_SET.ABB_SET)
+	abb_set = load_rules("tna.json")
+	abba = Abbreviation_dictionary(abb_set)
 	
 	print(uni_decode(abba.abbreviate_text(text), abba))
