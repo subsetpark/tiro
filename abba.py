@@ -8,7 +8,6 @@ import re
 class Abbreviation(object):
 	"""
 	Objects which represent abbreviation glyphs and can be regexped.
-	
 	"""
 	def __init__(self, abb_data, serial):
 		self.codepoint = unichr(serial)
@@ -33,10 +32,6 @@ class Abbreviation_dictionary(object):
 	"""
 	This object contains sequences of glyph transformations which it
 	can run on text objects.
-
-	>>> abba = Abbreviation_dictionary()
-	>>> abba.add_sequence(ABB_SET.WORDS)
-	>>> abba.add_sequence(ABB_SET.TRIGRAPHS)
 	"""
 	
 	def add_to_lookup(self, abbreviation):
@@ -70,16 +65,27 @@ class Abbreviation_dictionary(object):
 			self.add_sequence(sequence)
 	
 	def lookup_and_substitute(self, text, sequence):
+		"""
+		Performs simple regexp subs given a sequence of transforms and a text.
+		Each transform subs in a dynamically generated unicode 
+		control character.
+		"""
 		working_word = text
 		for abbreviation in sequence:
 			working_word = re.sub(r'(?i)'+abbreviation.pattern, abbreviation.codepoint, working_word) 
 		return working_word	
 	
 	def abbreviate_text(self, text):
+		"""
+		Runs each sequence of transforms in the order they were loaded into the
+		controller.
+		"""
+
 		working_text = text.decode('utf-8')
 		for sequence in self.abb_sequences:
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
+
 
 def base_decode(text, abb_dict):
 	"""
@@ -110,6 +116,9 @@ def uni_decode(text, abb_dict):
 			render += char
 	return render
 	
+
+
+
 if __name__ == "__main__":
 	import doctest
 	doctest.testmod()
@@ -119,5 +128,4 @@ if __name__ == "__main__":
 	words = text.split()
 	abba = Abbreviation_dictionary(ABB_SET.WORDS, ABB_SET.TRIGRAPHS, ABB_SET.DIGRAPHS, ABB_SET.SINGLETONS)
 	
-	#print base_decode(abba.abbreviate_text(text), abba)
 	print uni_decode(abba.abbreviate_text(text), abba)
