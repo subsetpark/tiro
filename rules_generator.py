@@ -22,7 +22,6 @@ def generate_sequence_abbreviations(text):
 	seq_patterns = []	
 	ordinal = 1329
 	for most_common in [element[0] for element in seq_counter]:
-		new_pattern = {}
 		new_pattern = {"name":most_common, 
 						"pattern":"(?<=\\b)" + most_common + "(?=\\b)",
 						"uni_rep":chr(ordinal)}
