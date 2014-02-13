@@ -14,16 +14,12 @@ class Abbreviation(object):
 		self.codepoint = unichr(serial)
 		self.pattern = abb_data['pattern']
 		self.name = abb_data['name']
-		if abb_data['uni_rep']:
-			self.uni_rep = abb_data['uni_rep']
-		else:
-			self.uni_rep = ''
+		self.uni_rep = abb_data.get('uni_rep',"")
+		
 	
 	def uni_report(self):
-		if self.uni_rep:
-			return self.uni_rep	
-		else:
-			return None
+		return self.uni_rep
+		
 			
 	def __repr__(self):
 		return self.name
@@ -40,15 +36,7 @@ class Abbreviation_dictionary(object):
 
 	>>> abba = Abbreviation_dictionary()
 	>>> abba.add_sequence(ABB_SET.WORDS)
-	>>> abba.lookup_and_substitute("the", abba.abb_sequences[0])
-	u'\ue000'
 	>>> abba.add_sequence(ABB_SET.TRIGRAPHS)
-	>>> abba.lookup_and_substitute("source", abba.abb_sequences[1])
-	u'sou\ue004'
-	>>> abba.abbreviate_text("the source")
-	u'\ue000 sou\ue004'
-	>>> print abba.uni_lookup(u'\ue000')
-	∂
 	"""
 	
 	def add_to_lookup(self, abbreviation):
@@ -81,14 +69,14 @@ class Abbreviation_dictionary(object):
 		for sequence in set_sequences:
 			self.add_sequence(sequence)
 	
-	def lookup_and_substitute(self, word, sequence):
-		working_word = word
+	def lookup_and_substitute(self, text, sequence):
+		working_word = text
 		for abbreviation in sequence:
-			working_word = re.sub(abbreviation.pattern, abbreviation.codepoint, working_word.lower()) 
+			working_word = re.sub(r'(?i)'+abbreviation.pattern, abbreviation.codepoint, working_word) 
 		return working_word	
 	
 	def abbreviate_text(self, text):
-		working_text = text
+		working_text = text.decode('utf-8')
 		for sequence in self.abb_sequences:
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
@@ -98,7 +86,7 @@ def base_decode(text, abb_dict):
 	Takes abbreviated text with unicode entities and renders them in ASCII 
 	"""
 	working_text = list(text)
-	render = ""
+	render = u""
 	for index, char in enumerate(working_text):
 		if ord(char) >= 57344:
 			render += abb_dict.lookup(char)
@@ -115,11 +103,11 @@ def uni_decode(text, abb_dict):
 	for char in working_text:
 		if ord(char) >= 57344:
 			if abb_dict.uni_lookup(char):
-				render += abb_dict.uni_lookup(char).decode('utf-8')
+				render += abb_dict.uni_lookup(char)
 			else:
-				render += abb_dict.lookup(char).decode('utf-8')
+				render += abb_dict.lookup(char)
 		else:
-			render += char.decode('utf-8')
+			render += char
 	return render
 	
 if __name__ == "__main__":
@@ -131,5 +119,5 @@ if __name__ == "__main__":
 	words = text.split()
 	abba = Abbreviation_dictionary(ABB_SET.WORDS, ABB_SET.TRIGRAPHS, ABB_SET.DIGRAPHS, ABB_SET.SINGLETONS)
 	
-	print base_decode(abba.abbreviate_text(text), abba)
+	#print base_decode(abba.abbreviate_text(text), abba)
 	print uni_decode(abba.abbreviate_text(text), abba)
