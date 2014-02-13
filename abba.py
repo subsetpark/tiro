@@ -10,7 +10,7 @@ class Abbreviation(object):
 	Objects which represent abbreviation glyphs and can be regexped.
 	"""
 	def __init__(self, abb_data, serial):
-		self.codepoint = unichr(serial)
+		self.codepoint = chr(serial)
 		self.pattern = abb_data['pattern']
 		self.name = abb_data['name']
 		self.uni_rep = abb_data.get('uni_rep',"")
@@ -41,11 +41,11 @@ class Abbreviation_dictionary(object):
 	def uni_lookup(self, char):
 		return self.lookup_table[char].uni_report()
 		
-	def add_sequence(self, set_sequence):
+	def add_sequence(self, pattern_sequence):
 		new_sequence = []
 		# construct a list of all abbreviation in a given set,
 		# then append them to the list of all sequences.
-		for pattern in set_sequence:
+		for pattern in pattern_sequence['patterns']:
 			# create the pattern here.
 			new_abbreviation = Abbreviation(pattern, self.serial)
 			new_sequence.append(new_abbreviation)
@@ -53,13 +53,13 @@ class Abbreviation_dictionary(object):
 			self.serial += 1
 		self.abb_sequences.append(new_sequence)
 	
-	def __init__(self, *set_sequences):
+	def __init__(self, sequence_set):
 		self.abb_sequences = []
 		self.lookup_table = {}
 		# begin creating unicode characters at the beginning 
 		# of the private use space
 		self.serial = 57344
-		for sequence in set_sequences:
+		for sequence in sequence_set:
 			self.add_sequence(sequence)
 	
 	def lookup_and_substitute(self, text, sequence):
@@ -77,9 +77,19 @@ class Abbreviation_dictionary(object):
 		"""
 		Runs each sequence of transforms in the order they were loaded into the
 		controller.
+		>>> abba = Abbreviation_dictionary(ABB_SET.ABB_SET)
+		>>> print(uni_decode(abba.abbreviate_text("this"), abba))
+		ðs
+		>>> print(uni_decode(abba.abbreviate_text("we are cömbined"), abba))
+		w̃ ar̯ cömbin̳
+		>>> print(uni_decode(abba.abbreviate_text("Don't forget"), abba))
+		Don't foꝛget
+		>>> print(uni_decode(abba.abbreviate_text(""), abba))
+		<BLANKLINE>
+		
 		"""
 
-		working_text = text.decode('utf-8')
+		working_text = text
 		for sequence in self.abb_sequences:
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
@@ -116,12 +126,12 @@ def uni_decode(text, abb_dict):
 	
 
 if __name__ == "__main__":
+	
 	import doctest
 	doctest.testmod()
 	
 	text = " ".join(sys.argv[1:])
 	
-	words = text.split()
-	abba = Abbreviation_dictionary(ABB_SET.WORDS, ABB_SET.TRIGRAPHS, ABB_SET.DIGRAPHS, ABB_SET.SINGLETONS)
+	abba = Abbreviation_dictionary(ABB_SET.ABB_SET)
 	
-	print uni_decode(abba.abbreviate_text(text), abba)
+	print(uni_decode(abba.abbreviate_text(text), abba))
