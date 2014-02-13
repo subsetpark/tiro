@@ -34,11 +34,5 @@ def generate_rules(text):
 	Analyze a text, and construct an abbreviation list.
 
 	"""	
-	word_set = {}
-	word_set["class"] = "words"
-	word_set["patterns"] = generate_word_abbreviations(text)
-	seq_set = {}
-	seq_set["class"] = "digraphs"
-	seq_set["patterns"] = generate_sequence_abbreviations(text)
-	abb_dict = [word_set] + [seq_set]
+	abb_dict = [{"class":"words","patterns":generate_word_abbreviations(text)}]+ [{"class":"digraphs","patterns":generate_sequence_abbreviations(text)}]
 	return abb_dict
