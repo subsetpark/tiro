@@ -46,10 +46,9 @@ class Abbreviation_dictionary(object):
 		# then append them to the list of all sequences.
 		for pattern in pattern_sequence['patterns']:
 			# create the pattern here.
-			new_abbreviation = Abbreviation(pattern, self.serial)
+			new_abbreviation = Abbreviation(pattern, next(self.pool))
 			new_sequence.append(new_abbreviation)
 			self.add_to_lookup(new_abbreviation)
-			self.serial += 1
 		self.abb_sequences.append(new_sequence)
 	
 	def __init__(self, sequence_set):
@@ -57,7 +56,7 @@ class Abbreviation_dictionary(object):
 		self.lookup_table = {}
 		# begin creating unicode characters at the beginning 
 		# of the private use space
-		self.serial = 57344
+		self.pool = iter(range(57344,63743))
 		for sequence in sequence_set:
 			self.add_sequence(sequence)
 	
@@ -93,6 +92,16 @@ class Abbreviation_dictionary(object):
 		for sequence in self.abb_sequences:
 			working_text = self.lookup_and_substitute(working_text, sequence)
 		return working_text
+	
+	def generate_legend(self):
+		"""
+		Generate a unicode legend to print before the text. Right now
+		it's brittle because it assumes unicode renderer."""
+		legend = ""
+		for sequence in self.abb_sequences:
+			for abbreviation in sequence:
+				legend += "{}: '{}'\n".format(abbreviation.uni_rep, abbreviation.name)
+		return legend
 
 
 	
@@ -144,6 +153,12 @@ if __name__ == "__main__":
 					none is supplied.""", default="tna.json")
 	parser.add_argument('-i', '--infile', type=argparse.FileType('r'))
 	parser.add_argument('-t', '--text', nargs="+", help="""	The text to operate on.""")	
+	parser.add_argument('-r', '--render', help="""
+					Render method. Accepts 'unicode' or 'base'.
+					""", default='unicode')
+	parser.add_argument('-l', '--legend', help="""
+					Print a legend at the top of the text.
+					""", action="store_true") 
 	args = parser.parse_args()
 	
 	if not sys.stdin.isatty():
@@ -163,4 +178,12 @@ if __name__ == "__main__":
 		abb_set = load_rules(ruleset)
 	abba = Abbreviation_dictionary(abb_set)
 	
-	print(uni_decode(abba.abbreviate_text(text), abba))
+	if args.legend:
+		legend= (abba.generate_legend())
+	
+	if args.render == "unicode":
+		print(legend)
+		print(uni_decode(abba.abbreviate_text(text), abba))
+	else:
+		if legend: print(legend)
+		print(base_decode(abba.abbreviate_text(text), abba))
