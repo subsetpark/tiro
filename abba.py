@@ -179,11 +179,10 @@ if __name__ == "__main__":
 	abba = Abbreviation_dictionary(abb_set)
 	
 	if args.legend:
-		legend= (abba.generate_legend())
+		legend = (abba.generate_legend())
 	
 	if args.render == "unicode":
-		print(legend)
 		print(uni_decode(abba.abbreviate_text(text), abba))
 	else:
-		if legend: print(legend)
+		if args.legend: print(legend)
 		print(base_decode(abba.abbreviate_text(text), abba))
