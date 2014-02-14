@@ -1,38 +1,47 @@
-import collections, re
+import collections, re, random
 
-def generate_word_abbreviations(text):
-	word_counter = collections.Counter()
-	for word in re.findall("\\w+", text):
-		word_counter[word.lower()] += 1
+class Char_pool(object):
+	def __init__(self):
+		self.pool = sum([list(range(x,y)) for x,y in [(383,447),(502,687),(913,1071),(1120,1319)]],[]) 
+		random.shuffle(self.pool)
+	
+	def provide_char(self):
+		return chr(self.pool.pop())
 
-	word_patterns = []	
-	ordinal = 994
-	for most_common in [element[0] for element in word_counter.most_common(15)]:
-		new_pattern = {"name":most_common, 
-						"pattern":"(?<=\\b)" + most_common + "(?=\\b)",
-						"uni_rep":chr(ordinal)}
-		ordinal += 1
-		word_patterns.append(new_pattern)
-	return word_patterns
+class Rules_generator(object):
+	def __init__(self):
+		self.cp = Char_pool()
 
-def generate_sequence_abbreviations(text):
-	seq_counter = collections.Counter(text.replace(" ","")[i:i+2] for i in range(len(text)-2)).most_common(10)
-	del seq_counter[0]
-
-	seq_patterns = []	
-	ordinal = 1329
-	for most_common in [element[0] for element in seq_counter]:
-		new_pattern = {"name":most_common, 
-						"pattern":"(?<=\\b)" + most_common + "(?=\\b)",
-						"uni_rep":chr(ordinal)}
-		ordinal += 1
-		seq_patterns.append(new_pattern)
-	return seq_patterns
-
+	def generate_word_abbreviations(self, text):
+		self.word_counter = collections.Counter(re.findall("\\w+", text)).most_common(15)
+		
+		self.word_patterns = []	
+		for most_common in [element[0] for element in self.word_counter]:
+			new_pattern = {"name":most_common, 
+							"pattern":"(?<=\\b)" + most_common + "(?=\\b)",
+							"uni_rep":self.cp.provide_char()}
+			self.word_patterns.append(new_pattern)
+		return self.word_patterns
+	
+	def generate_sequence_abbreviations(self, text):
+		self.seq_counter = collections.Counter(re.findall("\\w\\w\\w", text)).most_common(10)
+	
+		self.seq_patterns = []	
+		for most_common in [element[0] for element in self.seq_counter]:
+			new_pattern = {"name":most_common, 
+							"pattern":"(?<=\\b)" + most_common + "(?=\\b)",
+							"uni_rep":self.cp.provide_char()}
+			self.seq_patterns.append(new_pattern)
+		return self.seq_patterns
+	
+	def generate(self, text):
+		"""
+		Analyze a text, and construct an abbreviation list.
+	
+		"""	
+		abb_dict = [{"class":"words","patterns":self.generate_word_abbreviations(text)}]+ [{"class":"digraphs","patterns":self.generate_sequence_abbreviations(text)}]
+		return abb_dict
+		
 def generate_rules(text):
-	"""
-	Analyze a text, and construct an abbreviation list.
-
-	"""	
-	abb_dict = [{"class":"words","patterns":generate_word_abbreviations(text)}]+ [{"class":"digraphs","patterns":generate_sequence_abbreviations(text)}]
-	return abb_dict
+	generator = Rules_generator()
+	return generator.generate(text)
