@@ -13,7 +13,7 @@ class Rules_generator(object):
 		self.cp = Char_pool()
 
 	def generate_word_abbreviations(self, text):
-		self.word_counter = collections.Counter(re.findall("\\w+", text)).most_common(15)
+		self.word_counter = collections.Counter(re.findall("\\w+", text)).most_common(20)
 		
 		self.word_patterns = []	
 		for most_common in [element[0] for element in self.word_counter]:
@@ -24,7 +24,7 @@ class Rules_generator(object):
 		return self.word_patterns
 	
 	def generate_sequence_abbreviations(self, text):
-		self.seq_counter = collections.Counter(re.findall("\\w\\w\\w", text)).most_common(10)
+		self.seq_counter = collections.Counter(re.findall("\\w\\w\\w", text)).most_common(15)
 	
 		self.seq_patterns = []	
 		for most_common in [element[0] for element in self.seq_counter]:

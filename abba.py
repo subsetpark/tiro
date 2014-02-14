@@ -107,7 +107,7 @@ def base_decode(text, abb_dict):
 	working_text = list(text)
 	render = u""
 	for index, char in enumerate(working_text):
-		if ord(char) >= 57344:
+		if 63743 > ord(char) >= 57344:
 			render += abb_dict.lookup(char)
 		else:
 			render += char
@@ -120,7 +120,7 @@ def uni_decode(text, abb_dict):
 	working_text = list(text)
 	render = u""
 	for char in working_text:
-		if ord(char) >= 57344:
+		if 63743 > ord(char) >= 57344:
 			if abb_dict.uni_lookup(char):
 				render += abb_dict.uni_lookup(char)
 			else:
