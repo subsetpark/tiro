@@ -13,11 +13,9 @@ class Abbreviation(object):
 		self.pattern = abb_data['pattern']
 		self.name = abb_data['name']
 		self.uni_rep = abb_data.get('uni_rep',"")
-		
 	
 	def uni_report(self):
 		return self.uni_rep
-		
 			
 	def __repr__(self):
 		return self.name
