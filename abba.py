@@ -182,6 +182,7 @@ if __name__ == "__main__":
 		legend = (abba.generate_legend())
 	
 	if args.render == "unicode":
+		if args.legend: print(legend)
 		print(uni_decode(abba.abbreviate_text(text), abba))
 	else:
 		if args.legend: print(legend)
