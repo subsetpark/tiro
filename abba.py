@@ -31,11 +31,15 @@ class Abbreviation_dictionary(object):
 		# begin creating unicode characters at the beginning 
 		# of the private use space
 		self.pool = iter(range(57344,63743))
+		rep_search = re.compile("_rep$")
 		for section in config.sections():
 			codepoint = chr(next(self.pool))
 			self.add_to_dict(section, regnet.Regnet(config[section]['pattern']), codepoint)
 			for option in config.options(section):
-				self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(config[section][option]))
+				# Go through each section's options. If it has _rep in it,
+				# It's a representation method. Add it to the lookup.
+				if re.search(rep_search, option):
+					self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(config[section][option]))
 									
 			# find the list corresponding to the regnet's prec, create an abbreviation with info from the regnet, add the abbreviation to the list, then add the uni_rep to the lookup table.
 	
