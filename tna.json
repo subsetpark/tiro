@@ -163,14 +163,24 @@
                 "uni_rep": "\u021d"
             },
             {
-                "name": "TERMINAL_ED",
+                "name": "SUFF_ED",
                 "pattern": "ed(?=\\b)",
                 "uni_rep": "\u0333"
             },
             {
-                "name": "TERMINAL_LY",
+                "name": "SUFF_LY",
                 "pattern": "ly(?=\\b)",
                 "uni_rep": "\u1dcf"
+            },
+            {
+                "name": "SUFF_AL",
+                "pattern": "al(?=\\b)",
+                "uni_rep": "\u031F"
+            },
+            {
+                "name": "SUFF_IC",
+                "pattern": "ic(?=\\b)",
+                "uni_rep": "\u0326"
             },
             {
                 "name": "O_NK",
@@ -218,9 +228,9 @@
         "class": "singletons",
         "patterns": [
             {
-                "name": "LONG_S",
-                "pattern": "s(?=\\w)",
-                "uni_rep": "\u017f"
+                "name": "FINAL_S",
+                "pattern": "(?<=\\w)s(?=(\\b))",
+                "uni_rep": "s"
             },
             {
                 "name": "R_ROTUNDA",
@@ -228,9 +238,14 @@
                 "uni_rep": "\ua75b"
             },
             {
-                "name": "TERMINAL_E",
-                "pattern": "(?<=\\w)e(?=(\\b|s))",
+                "name": "SUFFIX_E",
+                "pattern": "(?<=\\w)e(?=(\\b))",
                 "uni_rep": "\u032f"
+            },
+           {
+                "name": "LONG_S",
+                "pattern": "s(?=\\w)",
+                "uni_rep": "\u017f"
             }
         ]
     }
