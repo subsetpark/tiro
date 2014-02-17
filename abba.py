@@ -8,10 +8,21 @@ class Abbreviation(object):
 	"""
 	Objects which represent abbreviation glyphs and can be regexped.
 	"""
+<<<<<<< HEAD
 	def __init__(self, name, pattern, codepoint):
 		self.codepoint = codepoint
 		self.pattern = pattern
 		self.name = name
+=======
+	def __init__(self, abb_data, serial):
+		self.codepoint = chr(serial)
+		self.pattern = abb_data['pattern']
+		self.name = abb_data['name']
+		self.uni_rep = abb_data.get('uni_rep',"")
+	
+	def uni_report(self):
+		return self.uni_rep
+>>>>>>> 217fabf2aa05fdf3cde588a5a1f3e4a64c3041e8
 			
 	def __repr__(self):
 		return self.name
@@ -179,6 +190,7 @@ if __name__ == "__main__":
 		legend = (abba.generate_legend())
 	
 	if args.render == "unicode":
+		if args.legend: print(legend)
 		print(uni_decode(abba.abbreviate_text(text), abba))
 	else:
 		if args.legend: print(legend)
