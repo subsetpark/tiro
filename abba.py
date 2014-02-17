@@ -1,23 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys, re, json, warnings
+import sys, re, configparser, regnet
 from rules_generator import generate_rules
 
 class Abbreviation(object):
 	"""
 	Objects which represent abbreviation glyphs and can be regexped.
 	"""
-	def __init__(self, abb_data, serial):
-		self.codepoint = chr(serial)
-		self.pattern = abb_data['pattern']
-		self.name = abb_data['name']
-		self.uni_rep = abb_data.get('uni_rep',"")
-		
-	
-	def uni_report(self):
-		return self.uni_rep
-		
+	def __init__(self, name, pattern, codepoint):
+		self.codepoint = codepoint
+		self.pattern = pattern
+		self.name = name
 			
 	def __repr__(self):
 		return self.name
@@ -30,36 +24,49 @@ class Abbreviation_dictionary(object):
 	This object contains sequences of glyph transformations which it
 	can run on text objects.
 	"""
-	
-	def add_to_lookup(self, abbreviation):
-		self.lookup_table[abbreviation.codepoint] = abbreviation
-		
-	def lookup(self, char):
-		return self.lookup_table[char].name
-		
-	def uni_lookup(self, char):
-		return self.lookup_table[char].uni_report()
-		
-	def add_sequence(self, pattern_sequence):
-		new_sequence = []
-		# construct a list of all abbreviation in a given set,
-		# then append them to the list of all sequences.
-		for pattern in pattern_sequence['patterns']:
-			# create the pattern here.
-			new_abbreviation = Abbreviation(pattern, next(self.pool))
-			new_sequence.append(new_abbreviation)
-			self.add_to_lookup(new_abbreviation)
-		self.abb_sequences.append(new_sequence)
-	
-	def __init__(self, sequence_set):
-		self.abb_sequences = []
+	def __init__(self, config):
+		self.abb_sequences = [[],[],[],[],[]]
 		self.lookup_table = {}
 		# begin creating unicode characters at the beginning 
 		# of the private use space
 		self.pool = iter(range(57344,63743))
-		for sequence in sequence_set:
-			self.add_sequence(sequence)
+		for section in config.sections():
+			codepoint = chr(next(self.pool))
+			self.add_to_dict(section, regnet.Regnet(config[section]['pattern']), codepoint)
+			for option in config.options(section):
+				self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(config[section][option]))
+									
+			# find the list corresponding to the regnet's prec, create an abbreviation with info from the regnet, add the abbreviation to the list, then add the uni_rep to the lookup table.
 	
+	def add_to_lookup(self, codepoint, section, option=None, value=None):
+		if not codepoint in self.lookup_table:
+			self.lookup_table[codepoint] = { 'name': section, option: value}
+		self.lookup_table[codepoint][option] = value
+		
+	def lookup(self, char):
+		return self.lookup_table[char]['name']
+		
+	def uni_lookup(self, char):
+		if 'uni_rep' in self.lookup_table[char]:
+			return self.lookup_table[char]['uni_rep']
+		else:
+			return self.lookup_table[char]['name']
+			
+	def add_to_dict(self, section, regnet, serial):
+		if not self.abb_sequences[regnet.prec]:
+			self.abb_sequences[regnet.prec] = [Abbreviation(
+								section, regnet.pattern, serial)]
+		else:
+			self.abb_sequences[regnet.prec].append(Abbreviation(
+								section, regnet.pattern, serial))
+								
+	def parse_rules(self, value):
+		working_value = list(value)
+		for i,c in enumerate(value):
+			if c is "{":
+				working_value[i:i+6] = chr(int('0x' + value[i+1:i+5], 16))
+				return ''.join(working_value)
+				
 	def lookup_and_substitute(self, text, sequence):
 		"""
 		Performs simple regexp subs given a sequence of transforms and a text.
@@ -68,24 +75,13 @@ class Abbreviation_dictionary(object):
 		"""
 		working_word = text
 		for abbreviation in sequence:
-			working_word = re.sub(r'(?i)'+abbreviation.pattern, abbreviation.codepoint, working_word) 
+			working_word = re.sub(abbreviation.pattern, abbreviation.codepoint, working_word) 
 		return working_word	
 	
 	def abbreviate_text(self, text):
 		"""
 		Runs each sequence of transforms in the order they were loaded into the
 		controller.
-		>>> abb_set = load_rules("tna.json")
-		>>> abba = Abbreviation_dictionary(abb_set)
-		>>> print(uni_decode(abba.abbreviate_text("this"), abba))
-		ðs
-		>>> print(uni_decode(abba.abbreviate_text("we are cömbined"), abba))
-		w̃ ar̯ cömbin̳
-		>>> print(uni_decode(abba.abbreviate_text("Don't forget"), abba))
-		Don't foꝛget
-		>>> print(uni_decode(abba.abbreviate_text(""), abba))
-		<BLANKLINE>
-		
 		"""
 
 		working_text = text
@@ -103,18 +99,17 @@ class Abbreviation_dictionary(object):
 				legend += "{}: '{}'\n".format(abbreviation.uni_rep, abbreviation.name)
 		return legend
 
-
-	
 def load_rules(filename):
-	input = open(filename)
-	return json.load(input)
+	config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),allow_no_value=True)
+	config.read_file(filename)
+	return config
 
 def base_decode(text, abb_dict):
 	"""
 	Takes abbreviated text with unicode entities and renders them in ASCII 
 	"""
 	working_text = list(text)
-	render = u""
+	render = ""
 	for index, char in enumerate(working_text):
 		if 63743 > ord(char) >= 57344:
 			render += abb_dict.lookup(char)
@@ -150,7 +145,7 @@ if __name__ == "__main__":
 	Analyze a text for frequency and generate abbreviations on the fly.""", action="store_true")
 	parser.add_argument("--ruleset", help="""
 					The ruleset to use. Uses The New Abbreviations if
-					none is supplied.""", default="tna.json")
+					none is supplied.""", default="tna.ini")
 	parser.add_argument('-i', '--infile', type=argparse.FileType('r'))
 	parser.add_argument('-t', '--text', nargs="+", help="""	The text to operate on.""")	
 	parser.add_argument('-r', '--render', help="""
@@ -170,14 +165,16 @@ if __name__ == "__main__":
 	else:
 		exit("No input received. Run 'python3 abba.py -h' for more information.")
 		
-	ruleset = args.ruleset
+	ruleset = open(args.ruleset)
 	
+	# Get a ruleset and use it to generate an abbreviation dictionary
 	if args.generate:
 		abb_set = generate_rules(text)
 	else:
 		abb_set = load_rules(ruleset)
 	abba = Abbreviation_dictionary(abb_set)
 	
+	# Generate a legend
 	if args.legend:
 		legend = (abba.generate_legend())
 	

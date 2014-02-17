@@ -47,10 +47,10 @@ class Regnet(object):
 		#find the rule that applies to this regnet, compile a regexp and assign
 		for rule in rules:
 			if re.match(rule[0], pattern):
-				self.pattern = re.compile(re.sub(rule[0], rule[1], pattern))
+				self.pattern = re.compile(re.sub(rule[0], rule[1], pattern), re.IGNORECASE)
 				self.prec = rule[2]
 				break
 		else:
 			self.prec = -1
-			self.pattern = re.compile(pattern)
+			self.pattern = re.compile(pattern, re.IGNORECASE)
 		
