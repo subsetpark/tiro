@@ -46,7 +46,7 @@ class Abbreviation_dictionary(object):
 				# It's a representation method. Add it to the lookup.
 				if re.search(rep_search, option):
 					has_a_rep = True
-					self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(config[section][option]))
+					self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(list(config[section][option])))
 			if not has_a_rep: 
 				self.add_to_lookup(codepoint, section)						
 			# find the list corresponding to the regnet's prec, create an abbreviation with info from the regnet, add the abbreviation to the list, then add the uni_rep to the lookup table.
