@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys, re, configparser, regnet
 import rules_generator
+import render
 
 """
 Abba: The Abbreviation engine
@@ -28,19 +29,11 @@ class Abbreviation(object):
 		self.pattern = pattern
 		self.name = name
 			
-	def __repr__(self):
-		return self.name
-
 			
 class Abbreviation_dictionary(object):
 	"""
 	This object contains sequences of glyph transformations which it
 	can run on text objects.
-	
-	>>> file = open('tna.ini')
-	>>> abb_set = load_rules(file)
-	>>> abba = Abbreviation_dictionary(abb_set)
-	
 	"""
 	def __init__(self, config):
 		self.abb_sequences = []
@@ -137,35 +130,6 @@ def load_rules(filename):
 	config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),allow_no_value=True)
 	config.read_file(filename)
 	return config
-
-def base_decode(text, abb_dict):
-	"""
-	Take abbreviated text with control entities and renders them in ASCII 
-	"""
-	working_text = list(text)
-	render = ""
-	for index, char in enumerate(working_text):
-		if 63743 > ord(char) >= 57344:
-			render += abb_dict.lookup(char)
-		else:
-			render += char
-	return render
-		
-def uni_decode(text, abb_dict):
-	"""
-	Take abbreviated text with control entities and renders them in unicode 
-	"""
-	working_text = list(text)
-	render = ""
-	for char in working_text:
-		if 63743 > ord(char) >= 57344:
-			if abb_dict.lookup(char, 'uni_rep'):
-				render += abb_dict.lookup(char, 'uni_rep')
-			else:
-				render += abb_dict.lookup(char, 'name')
-		else:
-			render += char
-	return render
 	
 
 if __name__ == "__main__":
@@ -216,7 +180,7 @@ if __name__ == "__main__":
 	# Choose the rendering method	
 	if args.render == "unicode":
 		if args.legend: print(legend)
-		print(uni_decode(abba.abbreviate_text(text), abba))
+		print(render.uni_decode(abba.abbreviate_text(text), abba))
 	else:
 		if args.legend: print(legend)
-		print(base_decode(abba.abbreviate_text(text), abba))
+		print(render.base_decode(abba.abbreviate_text(text), abba))
