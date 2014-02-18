@@ -221,8 +221,8 @@ if __name__ == "__main__":
 	if args.generate:
 		abb_set = generate_rules(text)
 	else:
-		ruleset = open(args.ruleset)
-		abb_set = load_rules(ruleset)
+		with open(args.ruleset) as ruleset:
+			abb_set = load_rules(ruleset)
 	abba = Abbreviation_dictionary(abb_set)
 	
 	# Generate a legend
