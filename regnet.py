@@ -23,7 +23,9 @@ rules = [
 (re.compile("(?P<pat>\\w+)#word"), "(?<=\\\\b)\g<pat>", 1),
 (re.compile("(?P<pat>^\\w\\w\\w$)"), "\g<pat>", 2),
 (re.compile("(?P<pat>^\\w\\w$)"), "\g<pat>", 3),
-(re.compile("(?P<pat>^\\w$)"), "\g<pat>", -1)
+(re.compile("(?P<pat>^\\w$)"), "\g<pat>", -1),
+(re.compile("(?P<pat>\\w+)#vow"), "(?<=[aeiouy])\g<pat>", 2),
+(re.compile("(?P<pat>\\w+)#hard"), "\g<pat>", 0)
 ] 
 
 

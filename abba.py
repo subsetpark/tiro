@@ -24,6 +24,11 @@ class Abbreviation_dictionary(object):
 	"""
 	This object contains sequences of glyph transformations which it
 	can run on text objects.
+	
+	>>> file = open('tna.ini')
+	>>> abb_set = load_rules(file)
+	>>> abba = Abbreviation_dictionary(abb_set)
+	
 	"""
 	def __init__(self, config):
 		self.abb_sequences = [[],[],[],[],[]]
@@ -33,14 +38,17 @@ class Abbreviation_dictionary(object):
 		self.pool = iter(range(57344,63743))
 		rep_search = re.compile("_rep$")
 		for section in config.sections():
+			has_a_rep = False
 			codepoint = chr(next(self.pool))
 			self.add_to_dict(section, regnet.Regnet(config[section]['pattern']), codepoint)
 			for option in config.options(section):
 				# Go through each section's options. If it has _rep in it,
 				# It's a representation method. Add it to the lookup.
 				if re.search(rep_search, option):
-					self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(config[section][option]))
-									
+					has_a_rep = True
+					self.add_to_lookup(codepoint, section, option=option, value=self.parse_rules(list(config[section][option])))
+			if not has_a_rep: 
+				self.add_to_lookup(codepoint, section)						
 			# find the list corresponding to the regnet's prec, create an abbreviation with info from the regnet, add the abbreviation to the list, then add the uni_rep to the lookup table.
 	
 	def add_to_lookup(self, codepoint, section, option=None, value=None):
@@ -66,11 +74,12 @@ class Abbreviation_dictionary(object):
 								section, regnet.pattern, serial))
 								
 	def parse_rules(self, value):
-		working_value = list(value)
-		for i,c in enumerate(value):
-			if c is "{":
-				working_value[i:i+6] = chr(int('0x' + value[i+1:i+5], 16))
-				return ''.join(working_value)
+		if '{' not in value:
+			return value
+		else:
+			i = value.index('{')
+			value[i:i+6] = chr(int('0x' + ''.join(value[i+1:i+5]), 16))
+			return ''.join(self.parse_rules(value))
 				
 	def lookup_and_substitute(self, text, sequence):
 		"""
