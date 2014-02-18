@@ -14,7 +14,7 @@ class Generator(object):
 	def token_counter(self, pattern, count):
 		return collections.Counter(re.findall(pattern, self.text)).most_common(count)
 	
-	def dict_builder(self, name_prefix, pattern_suffix, counter):
+	def dict_builder(self, counter, name_prefix=None, pattern_suffix=None):
 		patterns = {}
 		for most_common, _ in counter:
 			patterns[name_prefix + most_common.upper()] = { 
@@ -24,8 +24,8 @@ class Generator(object):
 		return patterns
 		
 	def generate_abbreviations(self):
-		patterns = self.dict_builder('_', "", self.token_counter("\\w\\w", 15))
-		patterns.update(self.dict_builder("", "#word", self.token_counter("\\w\\w+", 20)))
+		patterns = self.dict_builder(self.token_counter("\\w\\w", 15), name_prefix='_')
+		patterns.update(self.dict_builder(self.token_counter("\\w\\w+", 20), (pattern_suffix="#word")))
 		return patterns
 		
 	def generate_rules(self):
