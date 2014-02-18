@@ -1,25 +1,23 @@
-import collections, re, random
+import collections, re, random, configparser
 
 def generate_word_abbreviations(text, pool):
 	word_counter = collections.Counter(re.findall("\\w\\w+", text)).most_common(20)
-	
-	word_patterns = []	
+	word_patterns = {}
 	for most_common in [element[0] for element in word_counter]:
-		new_pattern = {"name":most_common.upper(), 
-						"pattern":"(?<=\\b)" + most_common + "(?=\\b)",
-						"uni_rep":chr(next(pool))}
-		word_patterns.append(new_pattern)
+		word_patterns[most_common.upper()] = {
+					"pattern":most_common + "#word",
+					"uni_rep":chr(next(pool))
+					}
 	return word_patterns
 
 def generate_sequence_abbreviations(text, pool):
 	seq_counter = collections.Counter(re.findall("\\w\\w", text)).most_common(15)
-
-	seq_patterns = []	
+	seq_patterns = {}
 	for most_common in [element[0] for element in seq_counter]:
-		new_pattern = {"name":'_'+most_common.upper(), 
+		seq_patterns['_'+most_common.upper()] = {
 						"pattern":most_common,
-						"uni_rep":chr(next(pool))}
-		seq_patterns.append(new_pattern)
+						"uni_rep":chr(next(pool))
+						}
 	return seq_patterns
 
 def generate_rules(text):
@@ -35,9 +33,8 @@ def generate_rules(text):
 	# make an iterator out of the list.
 	pool = iter(pool)
 	
+	config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),allow_no_value=True)
 	
-	abb_dict = [{"class":"words",
-				"patterns":generate_word_abbreviations(text, pool)}, 
-			   {"class":"digraphs",
-				"patterns":generate_sequence_abbreviations(text, pool)}]
-	return abb_dict
+	config.read_dict(generate_word_abbreviations(text, pool))
+	config.read_dict(generate_sequence_abbreviations(text, pool))
+	return config

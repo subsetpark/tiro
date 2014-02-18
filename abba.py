@@ -76,7 +76,7 @@ class Abbreviation_dictionary(object):
 	def parse_rules(self, value):
 		# Recurse through the uni_rep, replacing codepoint references as you go.
 		if '{' not in value:
-			return value
+			return ''.join(value)
 		else:
 			i = value.index('{')
 			value[i:i+6] = chr(int('0x' + ''.join(value[i+1:i+5]), 16))
@@ -109,9 +109,8 @@ class Abbreviation_dictionary(object):
 		Generate a unicode legend to print before the text. Right now
 		it's brittle because it assumes unicode renderer."""
 		legend = ""
-		for sequence in self.abb_sequences:
-			for abbreviation in sequence:
-				legend += "{}: '{}'\n".format(abbreviation.uni_rep, abbreviation.name)
+		for key in self.lookup_table.keys():
+			legend += "{}: '{}'\n".format(self.lookup_table[key]['uni_rep'], self.lookup_table[key]['name'])
 		return legend
 
 def load_rules(filename):
