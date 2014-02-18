@@ -1,8 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import sys, re, configparser, regnet
 from rules_generator import generate_rules
+
+"""
+Abba: The Abbreviation engine
+
+This application works in several stages:
+
+1. It reads abbreviation definitions written in the regnet markup from a .ini file.
+2. It compiles each abbreviation definition into a regnet object in order to obtain a regexp and a precedence ranking.
+3. It builds an abbreviation dictionary by:
+	a. creating a new abbreviation object using the regexp and putting it into the correct order indicated by the precedence ranking.
+	b. adding that abbreviation's rendering information to a lookup table.
+4. It runs through a provided text, replacing matching patterns with single unicode control codepoints that are linked to abbreviation objects.
+5. It renders the text according to the user's preference, referencing the control codepoints to the desired render method.
+
+"""
+
 
 class Abbreviation(object):
 	"""
@@ -35,9 +50,12 @@ class Abbreviation_dictionary(object):
 		# of the private use space
 		self.pool = iter(range(57344,63743))
 		rep_search = re.compile("_rep$")
+		# Read through the config file, pulling out abbreviation schemae
 		for section in config.sections():
 			has_a_rep = False
+			# Pull a control character from the pool
 			codepoint = chr(next(self.pool))
+			# Analyze the regnet markup and move it into the abbreviation dict
 			self.add_to_dict(section, regnet.Regnet(config[section]['pattern']), codepoint)
 			for option in config.options(section):
 				# Go through each section's options. If it has _rep in it,
