@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys, re, configparser, regnet
-from rules_generator import generate_rules
+import rules_generator
 
 """
 Abba: The Abbreviation engine
@@ -219,7 +219,7 @@ if __name__ == "__main__":
 	
 	# Get a ruleset and use it to generate an abbreviation dictionary
 	if args.generate:
-		abb_set = generate_rules(text)
+		abb_set = rules_generator.Generator(text).generate_rules()
 	else:
 		with open(args.ruleset) as ruleset:
 			abb_set = load_rules(ruleset)
