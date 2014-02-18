@@ -16,9 +16,7 @@ class Abbreviation(object):
 			
 	def __repr__(self):
 		return self.name
-	
-	# def __unicode__(self):
-	# 	return self.codepoint
+
 			
 class Abbreviation_dictionary(object):
 	"""
