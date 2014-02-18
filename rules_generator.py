@@ -11,9 +11,6 @@ class Generator(object):
 		self.symbol_pool = iter(self.symbol_pool)
 		self.text = text
 		
-	def token_counter(self, pattern, count):
-		return collections.Counter(re.findall(pattern, self.text)).most_common(count)
-	
 	def dict_builder(self, counter, name_prefix="", pattern_suffix=""):
 		patterns = {}
 		for most_common, _ in counter:
@@ -23,6 +20,9 @@ class Generator(object):
 			}
 		return patterns
 		
+	def token_counter(self, pattern, count):
+		return collections.Counter(re.findall(pattern, self.text)).most_common(count)
+		
 	def generate_abbreviations(self):
 		patterns = self.dict_builder(self.token_counter("\\w\\w", 15), name_prefix='_')
 		patterns.update(self.dict_builder(self.token_counter("\\w\\w+", 20), pattern_suffix="#word"))
@@ -31,7 +31,6 @@ class Generator(object):
 	def generate_rules(self):
 		"""
 		Analyze a text, and construct an abbreviation list.
-	
 		"""	
 		config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),allow_no_value=True)
 		

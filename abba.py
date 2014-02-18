@@ -23,7 +23,6 @@ class Abbreviation(object):
 	"""
 	Objects which represent abbreviation glyphs and can be regexped.
 	"""
-
 	def __init__(self, name, pattern, codepoint):
 		self.codepoint = codepoint
 		self.pattern = pattern
@@ -63,31 +62,29 @@ class Abbreviation_dictionary(object):
 				if re.search(rep_search, option):
 					has_a_rep = True
 					self.add_to_lookup(codepoint, section, option=option, 
-						value=self.parse_rules(list(config[section][option])))
+						value=regnet.parse_regnet(list(config[section][option])))
 			if not has_a_rep: 
 				self.add_to_lookup(codepoint, section)						
-	
+			
 	def add_to_lookup(self, codepoint, section, option=None, value=None):
 		"""
 		Add a representation method to the reverse lookup table as we create
 		the dictionary.
 		"""
 		if not codepoint in self.lookup_table:
-			self.lookup_table[codepoint] = { 'name': section, option: value}
-		self.lookup_table[codepoint][option] = value
-		
-	def lookup(self, char):
-		return self.lookup_table[char]['name']
-		
-	def uni_lookup(self, char):
-		"""
-		Return unicode representation of abbreviation
-		"""
-		if 'uni_rep' in self.lookup_table[char]:
-			return self.lookup_table[char]['uni_rep']
+			if option and value:
+				self.lookup_table[codepoint] = { 'name': section, option: value}		
+			else:
+				self.lookup_table[codepoint] = { 'name': section}
 		else:
-			return self.lookup_table[char]['name']
-			
+			self.lookup_table[codepoint][option] = value
+		
+	def lookup(self, char, option):
+		"""
+		Generic accessor for the lookup table.
+		"""
+		return self.lookup_table[char][option]
+		
 	def add_to_dict(self, section, regnet, serial):
 		"""
 		Given the makings of an abbreviation, create a new object
@@ -99,19 +96,6 @@ class Abbreviation_dictionary(object):
 		# add a new abbreviation object to the correct prec sequence
 		self.abb_sequences[regnet.prec].append(Abbreviation(
 								section, regnet.pattern, serial))
-								
-	def parse_rules(self, value):
-		"""
-		Read the formatted .ini looking for references to unicode characters. 
-		Recurse through the uni_rep, replacing codepoint references as you go.
-		"""
-		
-		if '{' not in value or value[value.index('{')+5] is not '}':
-			return ''.join(value)
-		else:
-			i = value.index('{')
-			value[i:i+6] = chr(int('0x' + ''.join(value[i+1:i+5]), 16))
-			return ''.join(self.parse_rules(value))
 				
 	def lookup_and_substitute(self, text, sequence):
 		"""
@@ -141,9 +125,9 @@ class Abbreviation_dictionary(object):
 		legend = ""
 		for key in self.lookup_table.keys():
 			try:
-				legend += "{}: '{}'\n".format(self.lookup_table[key]['uni_rep'], self.lookup_table[key]['name'])
+				legend += "{}: '{}'\n".format(self.lookup(key,'uni_rep'), self.lookup(key, 'name'))
 			except KeyError:
-				legend += "{}: '{}'\n".format(self.lookup_table[key]['name'], self.lookup_table[key]['name'])
+				legend += "{}: '{}'\n".format(self.lookup(key,'name'), self.lookup(key, 'name'))
 		return legend
 
 def load_rules(filename):
@@ -175,10 +159,10 @@ def uni_decode(text, abb_dict):
 	render = ""
 	for char in working_text:
 		if 63743 > ord(char) >= 57344:
-			if abb_dict.uni_lookup(char):
-				render += abb_dict.uni_lookup(char)
+			if abb_dict.lookup(char, 'uni_rep'):
+				render += abb_dict.lookup(char, 'uni_rep')
 			else:
-				render += abb_dict.lookup(char)
+				render += abb_dict.lookup(char, 'name')
 		else:
 			render += char
 	return render

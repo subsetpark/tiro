@@ -40,4 +40,17 @@ class Regnet(object):
 		else:
 			self.prec = -1
 			self.pattern = re.compile(pattern, re.IGNORECASE)
-		
+
+def parse_regnet(value):
+	"""
+	Read the .ini formatting looking for references to unicode characters. 
+	Recurse through the uni_rep, replacing codepoint references as you go.
+	"""
+	
+	if '{' not in value or value[value.index('{')+5] is not '}':
+		return ''.join(value)
+	else:
+		i = value.index('{')
+		value[i:i+6] = chr(int('0x' + ''.join(value[i+1:i+5]), 16))
+		return ''.join(parse_regnet(value))
+	
