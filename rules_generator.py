@@ -3,7 +3,7 @@ import collections, re, random, configparser
 def generate_word_abbreviations(text, pool):
 	word_counter = collections.Counter(re.findall("\\w\\w+", text)).most_common(20)
 	word_patterns = {}
-	for most_common in [element[0] for element in word_counter]:
+	for most_common, _ in word_counter:
 		word_patterns[most_common.upper()] = {
 					"pattern":most_common + "#word",
 					"uni_rep":chr(next(pool))
