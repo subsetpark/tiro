@@ -11,7 +11,16 @@ class Generator(object):
 		self.symbol_pool = iter(self.symbol_pool)
 		self.text = text
 		
+	def token_counter(self, pattern, count):
+		"""
+		Return the <count> most common instances of <pattern> in the text.
+		"""
+		return collections.Counter(re.findall(pattern, self.text)).most_common(count)	
+		
 	def dict_builder(self, counter, name_prefix="", pattern_suffix=""):
+		"""
+		Build a dictionary of regnet-style abbreviation definitions.
+		"""
 		patterns = {}
 		for most_common, _ in counter:
 			patterns[name_prefix + most_common.upper()] = { 
@@ -19,9 +28,6 @@ class Generator(object):
 				"uni_rep": chr(next(self.symbol_pool))
 			}
 		return patterns
-		
-	def token_counter(self, pattern, count):
-		return collections.Counter(re.findall(pattern, self.text)).most_common(count)
 		
 	def generate_abbreviations(self):
 		patterns = self.dict_builder(self.token_counter("\\w\\w", 15), name_prefix='_')
