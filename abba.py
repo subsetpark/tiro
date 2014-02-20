@@ -109,10 +109,12 @@ class Abbreviation_dictionary(object):
 		"""
 		legend = ""
 		for key in self.lookup_table.keys():
+			name = self.lookup(key, 'name')
 			try:
-				legend += "{}: '{}'\n".format(self.lookup(key,'uni_rep'), self.lookup(key, 'name'))
+				rep = self.lookup(key, 'uni_rep')
 			except KeyError:
-				legend += "{}: '{}'\n".format(self.lookup(key,'name'), self.lookup(key, 'name'))
+				rep = name
+			legend += "{}: '{}'\n".format(rep, name)
 		return legend
 
 def load_rules(filename):
