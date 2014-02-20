@@ -167,11 +167,11 @@ if __name__ == "__main__":
 	
 	# Get a ruleset and use it to generate an abbreviation dictionary
 	if args.generate:
-		abb_set = rules_generator.Generator(text).generate_rules()
+		abb_config = rules_generator.Generator(text).generate_rules()
 	else:
 		with open(args.ruleset) as ruleset:
-			abb_set = load_rules(ruleset)
-	abba = Abbreviation_dictionary(abb_set)
+			abb_config = load_rules(ruleset)
+	abba = Abbreviation_dictionary(abb_config)
 	
 	# Generate a legend
 	if args.legend:
