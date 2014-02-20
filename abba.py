@@ -174,7 +174,8 @@ if __name__ == "__main__":
 	# Choose the rendering method	
 	if args.legend: 
 		print(legend)
-	if args.render == "unicode":
-		print(render.uni_decode(abba.abbreviate_text(text), abba))
+	if args.render == 'unicode':
+		encoding = 'uni_rep'
 	else:
-		print(render.base_decode(abba.abbreviate_text(text), abba))
+		encoding = 'name'
+	print(render.decode(abba.abbreviate_text(text), abba, encoding))
