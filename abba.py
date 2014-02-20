@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys, re, configparser, regnet
+import sys, re, configparser, collections
+import regnet
 import rules_generator
 import render
 
@@ -19,17 +20,9 @@ This application works in several stages:
 
 """
 
+# Objects which represent abbreviation glyphs and can be regexped.
+Abbreviation = collections.namedtuple("Abbreviation", "name, pattern, codepoint")
 
-class Abbreviation(object):
-	"""
-	Objects which represent abbreviation glyphs and can be regexped.
-	"""
-	def __init__(self, name, pattern, codepoint):
-		self.codepoint = codepoint
-		self.pattern = pattern
-		self.name = name
-			
-			
 class Abbreviation_dictionary(object):
 	"""
 	This object contains sequences of glyph transformations which it
@@ -64,19 +57,21 @@ class Abbreviation_dictionary(object):
 		Add a representation method to the reverse lookup table as we create
 		the dictionary.
 		"""
-		if not codepoint in self.lookup_table:
+		if codepoint not in self.lookup_table:
+			self.lookup_table[codepoint] = {'name': section}
 			if option and value:
-				self.lookup_table[codepoint] = { 'name': section, option: value}		
-			else:
-				self.lookup_table[codepoint] = { 'name': section}
+				self.lookup_table[codepoint][option] = value
 		else:
 			self.lookup_table[codepoint][option] = value
 		
-	def lookup(self, char, option):
+	def lookup(self, char, option='uni_rep'):
 		"""
 		Generic accessor for the lookup table.
 		"""
-		return self.lookup_table[char][option]
+		try:
+			return self.lookup_table[char][option]
+		except KeyError:
+			return self.lookup_table[char]['name']
 		
 	def add_to_dict(self, section, regnet, serial):
 		"""
@@ -117,10 +112,9 @@ class Abbreviation_dictionary(object):
 		"""
 		legend = ""
 		for key in self.lookup_table.keys():
-			try:
-				legend += "{}: '{}'\n".format(self.lookup(key,'uni_rep'), self.lookup(key, 'name'))
-			except KeyError:
-				legend += "{}: '{}'\n".format(self.lookup(key,'name'), self.lookup(key, 'name'))
+			name = self.lookup(key, 'name')
+			rep = self.lookup(key)
+			legend += "{}: '{}'\n".format(rep, name)
 		return legend
 
 def load_rules(filename):
@@ -167,20 +161,21 @@ if __name__ == "__main__":
 	
 	# Get a ruleset and use it to generate an abbreviation dictionary
 	if args.generate:
-		abb_set = rules_generator.Generator(text).generate_rules()
+		abb_config = rules_generator.Generator(text).generate_rules()
 	else:
 		with open(args.ruleset) as ruleset:
-			abb_set = load_rules(ruleset)
-	abba = Abbreviation_dictionary(abb_set)
+			abb_config = load_rules(ruleset)
+	abba = Abbreviation_dictionary(abb_config)
 	
 	# Generate a legend
 	if args.legend:
 		legend = (abba.generate_legend())
 	
 	# Choose the rendering method	
-	if args.render == "unicode":
-		if args.legend: print(legend)
-		print(render.uni_decode(abba.abbreviate_text(text), abba))
+	if args.legend: 
+		print(legend)
+	if args.render == 'unicode':
+		encoding = 'uni_rep'
 	else:
-		if args.legend: print(legend)
-		print(render.base_decode(abba.abbreviate_text(text), abba))
+		encoding = 'name'
+	print(render.decode(abba.abbreviate_text(text), abba, encoding))
