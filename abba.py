@@ -23,7 +23,6 @@ This application works in several stages:
 # Objects which represent abbreviation glyphs and can be regexped.
 Abbreviation = collections.namedtuple("Abbreviation", "name, pattern, codepoint")
 
-
 class Abbreviation_dictionary(object):
 	"""
 	This object contains sequences of glyph transformations which it
@@ -58,11 +57,10 @@ class Abbreviation_dictionary(object):
 		Add a representation method to the reverse lookup table as we create
 		the dictionary.
 		"""
-		if not codepoint in self.lookup_table:
+		if codepoint not in self.lookup_table:
+			self.lookup_table[codepoint]['name'] = section
 			if option and value:
-				self.lookup_table[codepoint] = { 'name': section, option: value}		
-			else:
-				self.lookup_table[codepoint] = { 'name': section}
+				self.lookup_table[codepoint][option] = value
 		else:
 			self.lookup_table[codepoint][option] = value
 		
