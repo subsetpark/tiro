@@ -172,9 +172,9 @@ if __name__ == "__main__":
 		legend = (abba.generate_legend())
 	
 	# Choose the rendering method	
+	if args.legend: 
+		print(legend)
 	if args.render == "unicode":
-		if args.legend: print(legend)
 		print(render.uni_decode(abba.abbreviate_text(text), abba))
 	else:
-		if args.legend: print(legend)
 		print(render.base_decode(abba.abbreviate_text(text), abba))
