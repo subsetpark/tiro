@@ -19,10 +19,7 @@ def uni_decode(text, abb_dict):
 	render = ""
 	for char in working_text:
 		if 57344 <= ord(char) < 63743:
-			if abb_dict.lookup(char, 'uni_rep'):
-				render += abb_dict.lookup(char, 'uni_rep')
-			else:
-				render += abb_dict.lookup(char, 'name')
+			render += abb_dict.lookup(char)
 		else:
 			render += char
 	return render

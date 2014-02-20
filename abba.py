@@ -64,11 +64,14 @@ class Abbreviation_dictionary(object):
 		else:
 			self.lookup_table[codepoint][option] = value
 		
-	def lookup(self, char, option):
+	def lookup(self, char, option='uni_rep'):
 		"""
 		Generic accessor for the lookup table.
 		"""
-		return self.lookup_table[char][option]
+		try:
+			return self.lookup_table[char][option]
+		except KeyError:
+			return self.lookup_table[char]['name']
 		
 	def add_to_dict(self, section, regnet, serial):
 		"""
@@ -110,10 +113,7 @@ class Abbreviation_dictionary(object):
 		legend = ""
 		for key in self.lookup_table.keys():
 			name = self.lookup(key, 'name')
-			try:
-				rep = self.lookup(key, 'uni_rep')
-			except KeyError:
-				rep = name
+			rep = self.lookup(key)
 			legend += "{}: '{}'\n".format(rep, name)
 		return legend
 
