@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys, re, configparser, regnet
+import sys, re, configparser, collections
+import regnet
 import rules_generator
 import render
 
@@ -19,17 +20,10 @@ This application works in several stages:
 
 """
 
+# Objects which represent abbreviation glyphs and can be regexped.
+Abbreviation = collections.namedtuple("Abbreviation", "name, pattern, codepoint")
 
-class Abbreviation(object):
-	"""
-	Objects which represent abbreviation glyphs and can be regexped.
-	"""
-	def __init__(self, name, pattern, codepoint):
-		self.codepoint = codepoint
-		self.pattern = pattern
-		self.name = name
-			
-			
+
 class Abbreviation_dictionary(object):
 	"""
 	This object contains sequences of glyph transformations which it
