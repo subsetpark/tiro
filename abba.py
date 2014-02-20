@@ -58,7 +58,7 @@ class Abbreviation_dictionary(object):
 		the dictionary.
 		"""
 		if codepoint not in self.lookup_table:
-			self.lookup_table[codepoint]['name'] = section
+			self.lookup_table[codepoint] = {'name': section}
 			if option and value:
 				self.lookup_table[codepoint][option] = value
 		else:
