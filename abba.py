@@ -41,7 +41,7 @@ class Abbreviation_dictionary(object):
 			# Pull a control character from the pool
 			codepoint = chr(next(self.pool))
 			# Analyze the regnet markup and move it into the abbreviation dict
-			self.add_to_dict(section, regnet.Regnet(config[section]['pattern']), codepoint)
+			self.add_to_sequences(section, regnet.Regnet(config[section]['pattern']), codepoint)
 			for option in config.options(section):
 				# Go through each section's options. If it has _rep in it,
 				# It's a representation method. Add it to the lookup.
@@ -73,7 +73,7 @@ class Abbreviation_dictionary(object):
 		except KeyError:
 			return self.lookup_table[char]['name']
 		
-	def add_to_dict(self, section, regnet, serial):
+	def add_to_sequences(self, section, regnet, serial):
 		"""
 		Given the makings of an abbreviation, create a new object
 		and add it to the sequences list.
