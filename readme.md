@@ -22,16 +22,16 @@ Abbreviaties the characters 'nd' whenever they are found after a vowel. But not,
 
 `abba` can apply a set of abbreviation rules resulting in an abbreviated document, which can then be rendered as the user pleases. Currently the application supports rendering to unicode text. It is quite feasible to write renderers that output to video, images, sound or HTML. Here is a sample text abbreviated with a sample set of rules from [The New Abbreviations][TNA]:
 
-> Verani̬s, b̭̫͞ ſuperioꝛ to a‖
-    300,000 of my fri̭ͫs in my ey̭s
-    Hav̭ ỿ com̭ hom̭ to ỿr ho̬ſehold gods
-    ⁊ lovi̫ bꝛoðers ⁊ old moðer?
-    ỿv̭ com̭ back! o happy news foꝛ m̃!
-    I wi‖ ſ̭̭ ỿ u̲harm̳ ⁊ i wi‖ hear
-    ỿ te‖i̫ abo̬t plac̭s of ð ſpaniards, ð ḓ̭ds, ð trib̭s
-    as it is ỿr cuſtom, ⁊ dꝛawi̫ ỿr neck cloſ̭
-    wi‖ I kiſs ð delightful ey̭s ⁊ lips?
-    O how many happy men ðr ar̭,
+> Verani̬s, b̭̫͞ ſuperioꝛ to a‖  
+    300,000 of my fri̭ͫs in my ey̭s  
+    Hav̭ ỿ com̭ hom̭ to ỿr ho̬ſehold gods  
+    ⁊ lovi̫ bꝛoðers ⁊ old moðer?  
+    ỿv̭ com̭ back! o happy news foꝛ m̃!  
+    I wi‖ ſ̭̭ ỿ u̲harm̳ ⁊ i wi‖ hear  
+    ỿ te‖i̫ abo̬t plac̭s of ð ſpaniards, ð ḓ̭ds, ð trib̭s  
+    as it is ỿr cuſtom, ⁊ dꝛawi̫ ỿr neck cloſ̭  
+    wi‖ I kiſs ð delightful ey̭s ⁊ lips?  
+    O how many happy men ðr ar̭,  
     Ⱳo is happi̭r ⁊ moꝛ̭ bḽſſ̳ ðan I am?
 
 ## Generator mode
