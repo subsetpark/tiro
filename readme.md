@@ -5,13 +5,13 @@
 ## Abbreviation rules
 
 Shorthand alphabetical substitution rules can be written in a lightweight markup in the INI format. For instance, here is a single sample rule:
-```
+``` .ini
 [AND]
 pattern: and#iso
 uni_rep: {204a}
 ```
 Which looks for occurances of the word 'and' by itself and then replaces it with an abbreviation of the user's choosing. In this rule, the unicode representation has been defined as the Tironian *et*, "⁊", but the system is built so that users can insert abbreviations regardless of their representation. Thus, they are not bound by the unicode character set. This sample rule:
-```
+``` .ini
 [O_ND]
 pattern: nd#vow
 uni_rep: {036b}
