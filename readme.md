@@ -34,6 +34,8 @@ Abbreviaties the characters 'nd' whenever they are found after a vowel. But not,
     O how many happy men ðr ar̭,  
     Ⱳo is happi̭r ⁊ moꝛ̭ bḽſſ̳ ðan I am?
 
+[TNA]: https://thoughtstreams.io/zdsmith/new-abbreviations/
+
 ## Generator mode
 
 `abba` can also perform simple analysis on a provided text in order to generate its own set of abbreviations, and then apply those. Here is a sample text with dynamically generated abbrevations:
