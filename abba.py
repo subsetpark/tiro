@@ -23,7 +23,7 @@ This application works in several stages:
 # Objects which represent abbreviation glyphs and can be regexped.
 Abbreviation = collections.namedtuple("Abbreviation", "name, pattern, codepoint")
 
-class Abbreviation_dictionary(object):
+class Abbreviation_register(object):
 	"""
 	This object contains sequences of glyph transformations which it
 	can run on text objects.
@@ -55,7 +55,7 @@ class Abbreviation_dictionary(object):
 	def add_to_lookup(self, codepoint, section, option=None, value=None):
 		"""
 		Add a representation method to the reverse lookup table as we create
-		the dictionary.
+		the register.
 		"""
 		if codepoint not in self.lookup_table:
 			self.lookup_table[codepoint] = {'name': section}
@@ -159,13 +159,13 @@ if __name__ == "__main__":
 	else:
 		exit("No input received. Run 'python3 abba.py -h' for more information.")
 	
-	# Get a ruleset and use it to generate an abbreviation dictionary
+	# Get a ruleset and use it to generate an abbreviation register
 	if args.generate:
 		abb_config = rules_generator.Generator(text).generate_rules()
 	else:
 		with open(args.ruleset) as ruleset:
 			abb_config = load_rules(ruleset)
-	abba = Abbreviation_dictionary(abb_config)
+	abba = Abbreviation_register(abb_config)
 	
 	# Generate a legend
 	if args.legend:
