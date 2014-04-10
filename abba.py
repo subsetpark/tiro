@@ -110,12 +110,9 @@ class Abbreviation_register(object):
 		Generate a unicode legend to print before the text. Right now
 		it's brittle because it assumes unicode renderer.
 		"""
-		legend = ""
-		for key in self.lookup_table.keys():
-			name = self.lookup(key, 'name')
-			rep = self.lookup(key)
-			legend += "{}: '{}'\n".format(rep, name)
-		return legend
+		return "\n".join("{}: '{}'"
+						 .format(self.lookup(key), self.lookup(key, 'name')) 
+						  for key in self.lookup_table.keys())
 
 def load_rules(filename):
 	"""
@@ -166,16 +163,11 @@ if __name__ == "__main__":
 		with open(args.ruleset) as ruleset:
 			abb_config = load_rules(ruleset)
 	abba = Abbreviation_register(abb_config)
-	
-	# Generate a legend
-	if args.legend:
-		legend = (abba.generate_legend())
-	
+
 	# Choose the rendering method	
 	if args.legend: 
+		legend = (abba.generate_legend())
 		print(legend)
-	if args.render == 'unicode':
-		encoding = 'uni_rep'
-	else:
-		encoding = 'name'
+	
+	encoding = 'uni_rep' if args.render == 'unicode' else 'name'
 	print(render.decode(abba.abbreviate_text(text), abba, encoding))
