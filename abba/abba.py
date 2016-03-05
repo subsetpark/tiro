@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
-import re
-import configparser
 import collections
-import regnet
-import rules_generator
+import re
+import sys
+
+import abba.regnet
+import configparser
+
 
 """
 Abba: The Abbreviation engine
@@ -25,6 +26,7 @@ This application works in several stages:
    control codepoints to the desired render method.
 
 """
+__all__ = ["AbbreviationRegister"]
 
 # Objects which represent abbreviation glyphs and can be regexped.
 Abbreviation = collections.namedtuple("Abbreviation", "name, pattern, codepoint")
