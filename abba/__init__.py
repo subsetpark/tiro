@@ -1,1 +1,1 @@
-
+from abbreviate import AbbreviationRegister

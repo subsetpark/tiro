@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import collections
+from os import path
 import re
 import sys
 
-import abba.regnet
+import rules_generator
+import regnet
 import configparser
 
 
@@ -110,6 +112,8 @@ def load_rules(filename):
 
 
 if __name__ == "__main__":
+    dir_name = path.dirname(__file__)
+    tna_filename = path.join(dir_name, "config", "tna.ini")
     # Parse command line arguments
     import argparse
     parser = argparse.ArgumentParser()
@@ -118,7 +122,7 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("--ruleset",
                         help="The ruleset to use. Uses The New Abbreviations if none is supplied.",
-                        default="../tna.ini")
+                        default=tna_filename)
     parser.add_argument('-i', '--infile', type=argparse.FileType('r'))
     parser.add_argument('-t', '--text', nargs="+", help="""	The text to operate on.""")
     parser.add_argument('-r', '--render', help="Render method. Accepts 'unicode' or 'base'.",
