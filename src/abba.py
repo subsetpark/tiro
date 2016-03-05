@@ -6,7 +6,6 @@ import configparser
 import collections
 import regnet
 import rules_generator
-import render
 
 """
 Abba: The Abbreviation engine
@@ -37,46 +36,32 @@ class AbbreviationRegister(object):
     This object contains sequences of glyph transformations which it can run on
     text objects.
     """
+    CONTROL_CHARS_START = 57344
+    CONTROL_CHARS_END = 63743
 
-    def __init__(self, config):
+    def __init__(self, config, encoding="uni_rep"):
         self.abb_sequences = []
         self.lookup_table = {}
         # begin creating unicode characters at the beginning
         # of the private use space
-        self.pool = range(57344, 63743)
+        self.pool = range(self.CONTROL_CHARS_START, self.CONTROL_CHARS_END)
         # Read through the config file, pulling out abbreviation schemae
-        for i, section in zip(self.pool, config.sections()):
+        for i, section_name in zip(self.pool, config.sections()):
             # Analyze the regnet markup and move it into the abbreviation dict
             codepoint = chr(i)
-            regnet_object = regnet.Regnet(config[section]['pattern'])
-            self.add_to_sequences(section, regnet_object, codepoint)
-            for option in config.options(section):
-                # Go through each section's options. If it has _rep in it,
-                # It's a representation method. Add it to the lookup.
-                if option.endswith("_rep"):
-                    value = regnet.parse_regnet(list(config[section][option]))
-                    self.add_to_lookup(codepoint, section, option=option, value=value)
-                    break
+            regnet_object = regnet.Regnet(config[section_name]['pattern'])
+            self.add_to_sequences(section_name, regnet_object, codepoint)
+            if encoding in config.options(section_name):
+                value = regnet.parse_regnet(list(config[section_name][encoding]))
+                self.lookup_table[codepoint] = value
             else:
-                self.add_to_lookup(codepoint, section)
+                self.lookup_table[codepoint] = section_name
 
-    def add_to_lookup(self, codepoint, section, option=None, value=None):
-        """
-        Add a representation method to the reverse lookup table as we create
-        the register.
-        """
-        self.lookup_table.setdefault(codepoint, {'name': section})
-        if option and value:
-            self.lookup_table[codepoint][option] = value
-
-    def lookup(self, char, option='uni_rep'):
-        """
-        Generic accessor for the lookup table.
-        """
-        try:
-            return self.lookup_table[char][option]
-        except KeyError:
-            return self.lookup_table[char]['name']
+    def __getitem__(self, char):
+        if self.CONTROL_CHARS_START <= ord(char) < self.CONTROL_CHARS_END:
+            return self.lookup_table[char]
+        else:
+            return char
 
     def add_to_sequences(self, section, regnet_object, serial):
         """
@@ -109,6 +94,9 @@ class AbbreviationRegister(object):
                          .format(self.lookup(key), self.lookup(key, 'name'))
                          for key in self.lookup_table.keys())
 
+    def decode(self, text):
+        return "".join(self[char] for char in text)
+
 
 def load_rules(filename):
     """
@@ -121,10 +109,6 @@ def load_rules(filename):
 
 
 if __name__ == "__main__":
-
-    import doctest
-    doctest.testmod()
-
     # Parse command line arguments
     import argparse
     parser = argparse.ArgumentParser()
@@ -158,12 +142,13 @@ if __name__ == "__main__":
     else:
         with open(args.ruleset) as ruleset:
             abb_config = load_rules(ruleset)
-    abba = AbbreviationRegister(abb_config)
+    encoding = 'uni_rep' if args.render == 'unicode' else 'name'
+    abba = AbbreviationRegister(abb_config, encoding=encoding)
 
     # Choose the rendering method
     if args.legend:
         legend = abba.generate_legend()
         print(legend)
 
-    encoding = 'uni_rep' if args.render == 'unicode' else 'name'
-    print(render.decode(abba.abbreviate_text(text), abba, encoding))
+    abbreviated = abba.abbreviate_text(text)
+    print(abba.decode(abbreviated))
