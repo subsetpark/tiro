@@ -7,7 +7,7 @@ from os import path
 
 import yaml
 
-import regnets
+from regnets import Regnet, Parser
 from rules_generator import Generator
 
 
@@ -55,7 +55,7 @@ class AbbreviationRegister(object):
         for i, abbreviation in zip(self.pool, abbreviations):
             # Analyze the regnet markup and move it into the abbreviation dict
             codepoint = chr(i)
-            regnet = regnets.Regnet(abbreviation["pattern"])
+            regnet = Regnet(abbreviation["pattern"])
             name = abbreviation["name"]
             self.add_to_sequences(name, regnet, codepoint)
 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     else:
         with open(args.ruleset, 'r') as f:
             ruleset = yaml.safe_load(f)
-    parser = regnets.Parser(ruleset, encoding)
+    parser = Parser(ruleset, encoding)
     abba = AbbreviationRegister(parser.abbreviations, encoding=encoding)
 
     # Choose the rendering method
