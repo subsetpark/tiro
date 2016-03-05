@@ -31,7 +31,7 @@ This application works in several stages:
 Abbreviation = collections.namedtuple("Abbreviation", "name, pattern, codepoint")
 
 
-class Abbreviation_register(object):
+class AbbreviationRegister(object):
 
     """
     This object contains sequences of glyph transformations which it can run on
@@ -43,23 +43,21 @@ class Abbreviation_register(object):
         self.lookup_table = {}
         # begin creating unicode characters at the beginning
         # of the private use space
-        self.pool = iter(range(57344, 63743))
-        rep_search = re.compile("_rep$")
+        self.pool = range(57344, 63743)
         # Read through the config file, pulling out abbreviation schemae
-        for section in config.sections():
-            has_a_rep = False
-            # Pull a control character from the pool
-            codepoint = chr(next(self.pool))
+        for i, section in zip(self.pool, config.sections()):
             # Analyze the regnet markup and move it into the abbreviation dict
-            self.add_to_sequences(section, regnet.Regnet(config[section]['pattern']), codepoint)
+            codepoint = chr(i)
+            regnet_object = regnet.Regnet(config[section]['pattern'])
+            self.add_to_sequences(section, regnet_object, codepoint)
             for option in config.options(section):
                 # Go through each section's options. If it has _rep in it,
                 # It's a representation method. Add it to the lookup.
-                if re.search(rep_search, option):
-                    has_a_rep = True
-                    self.add_to_lookup(codepoint, section, option=option,
-                                       value=regnet.parse_regnet(list(config[section][option])))
-            if not has_a_rep:
+                if option.endswith("_rep"):
+                    value = regnet.parse_regnet(list(config[section][option]))
+                    self.add_to_lookup(codepoint, section, option=option, value=value)
+                    break
+            else:
                 self.add_to_lookup(codepoint, section)
 
     def add_to_lookup(self, codepoint, section, option=None, value=None):
@@ -67,11 +65,8 @@ class Abbreviation_register(object):
         Add a representation method to the reverse lookup table as we create
         the register.
         """
-        if codepoint not in self.lookup_table:
-            self.lookup_table[codepoint] = {'name': section}
-            if option and value:
-                self.lookup_table[codepoint][option] = value
-        else:
+        self.lookup_table.setdefault(codepoint, {'name': section})
+        if option and value:
             self.lookup_table[codepoint][option] = value
 
     def lookup(self, char, option='uni_rep'):
@@ -83,37 +78,27 @@ class Abbreviation_register(object):
         except KeyError:
             return self.lookup_table[char]['name']
 
-    def add_to_sequences(self, section, regnet, serial):
+    def add_to_sequences(self, section, regnet_object, serial):
         """
         Given the makings of an abbreviation, create a new object
         and add it to the sequences list.
         """
         # build abb_sequences to the number of prec levels
-        while len(self.abb_sequences) < regnet.prec + 1:
+        while len(self.abb_sequences) < regnet_object.prec + 1:
             self.abb_sequences.append([])
         # add a new abbreviation object to the correct prec sequence
-        self.abb_sequences[regnet.prec].append(Abbreviation(
-            section, regnet.pattern, serial))
-
-    def lookup_and_substitute(self, text, sequence):
-        """
-        Performs simple regexp subs given a sequence of transforms and a text.
-        Each transform subs in a dynamically generated unicode
-        control character.
-        """
-        for abbreviation in sequence:
-            text = re.sub(abbreviation.pattern, abbreviation.codepoint, text)
-        return text
+        self.abb_sequences[regnet_object.prec].append(Abbreviation(
+            section, regnet_object.pattern, serial))
 
     def abbreviate_text(self, text):
         """
         Runs each sequence of transforms in the order they were loaded into the
         controller.
         """
-        working_text = text
         for sequence in self.abb_sequences:
-            working_text = self.lookup_and_substitute(working_text, sequence)
-        return working_text
+            for abbreviation in sequence:
+                text = re.sub(abbreviation.pattern, abbreviation.codepoint, text)
+        return text
 
     def generate_legend(self):
         """
@@ -154,7 +139,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--render', help="Render method. Accepts 'unicode' or 'base'.",
                         default='unicode')
     parser.add_argument('-l', '--legend', help="Print a legend at the top of the text.",
-            action="store_true")
+                        action="store_true")
     args = parser.parse_args()
 
     # Determine input method
@@ -173,11 +158,11 @@ if __name__ == "__main__":
     else:
         with open(args.ruleset) as ruleset:
             abb_config = load_rules(ruleset)
-    abba = Abbreviation_register(abb_config)
+    abba = AbbreviationRegister(abb_config)
 
     # Choose the rendering method
     if args.legend:
-        legend = (abba.generate_legend())
+        legend = abba.generate_legend()
         print(legend)
 
     encoding = 'uni_rep' if args.render == 'unicode' else 'name'

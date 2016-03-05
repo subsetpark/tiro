@@ -20,7 +20,9 @@ class Generator(object):
         """
         Return the <count> most common instances of <pattern> in the text.
         """
-        return collections.Counter(re.findall(pattern, self.text)).most_common(count)
+        return collections.Counter(
+            re.findall(pattern, self.text)
+        ).most_common(count)
 
     def dict_builder(self, counter, name_prefix="", pattern_suffix=""):
         """
