@@ -70,12 +70,13 @@ class AbbreviationRegister(object):
         Given the makings of an abbreviation, create a new object
         and add it to the sequences list.
         """
+        precedence = regnet_object.prec
         # build abb_sequences to the number of prec levels
-        while len(self.abb_sequences) < regnet_object.prec + 1:
+        while len(self.abb_sequences) < precedence + 1:
             self.abb_sequences.append([])
         # add a new abbreviation object to the correct prec sequence
-        self.abb_sequences[regnet_object.prec].append(Abbreviation(
-            section, regnet_object.pattern, serial))
+        self.abb_sequences[precedence].append(
+            Abbreviation(section, regnet_object.pattern, serial))
 
     def abbreviate_text(self, text):
         """
