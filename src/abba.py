@@ -42,6 +42,7 @@ class AbbreviationRegister(object):
     def __init__(self, config, encoding="uni_rep"):
         self.abb_sequences = []
         self.lookup_table = {}
+        self.legend = {}
         # begin creating unicode characters at the beginning
         # of the private use space
         self.pool = range(self.CONTROL_CHARS_START, self.CONTROL_CHARS_END)
@@ -53,9 +54,10 @@ class AbbreviationRegister(object):
             self.add_to_sequences(section_name, regnet_object, codepoint)
             if encoding in config.options(section_name):
                 value = regnet.parse_regnet(list(config[section_name][encoding]))
-                self.lookup_table[codepoint] = value
             else:
-                self.lookup_table[codepoint] = section_name
+                value = section_name
+            self.lookup_table[codepoint] = value
+            self.legend[section_name] = value
 
     def __getitem__(self, char):
         if self.CONTROL_CHARS_START <= ord(char) < self.CONTROL_CHARS_END:
@@ -86,13 +88,9 @@ class AbbreviationRegister(object):
         return text
 
     def generate_legend(self):
-        """
-        Generate a unicode legend to print before the text. Right now
-        it's brittle because it assumes unicode renderer.
-        """
-        return "\n".join("{}: '{}'"
-                         .format(self.lookup(key), self.lookup(key, 'name'))
-                         for key in self.lookup_table.keys())
+        return "\n".join("{}: {}"
+                         .format(value, key)
+                         for key, value in self.legend.items())
 
     def decode(self, text):
         return "".join(self[char] for char in text)
