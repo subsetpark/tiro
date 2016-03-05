@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import collections
-from os import path
 import re
 import sys
+from os import path
 
-import rules_generator
-import regnet
-import configparser
+import yaml
+
+import regnets
+from rules_generator import Generator
 
 
 """
@@ -43,7 +44,7 @@ class AbbreviationRegister(object):
     CONTROL_CHARS_START = 57344
     CONTROL_CHARS_END = 63743
 
-    def __init__(self, config, encoding="uni_rep"):
+    def __init__(self, abbreviations, encoding="uni_rep"):
         self.abb_sequences = []
         self.lookup_table = {}
         self.legend = {}
@@ -51,17 +52,16 @@ class AbbreviationRegister(object):
         # of the private use space
         self.pool = range(self.CONTROL_CHARS_START, self.CONTROL_CHARS_END)
         # Read through the config file, pulling out abbreviation schemae
-        for i, section_name in zip(self.pool, config.sections()):
+        for i, abbreviation in zip(self.pool, abbreviations):
             # Analyze the regnet markup and move it into the abbreviation dict
             codepoint = chr(i)
-            regnet_object = regnet.Regnet(config[section_name]['pattern'])
-            self.add_to_sequences(section_name, regnet_object, codepoint)
-            if encoding in config.options(section_name):
-                value = regnet.parse_regnet(list(config[section_name][encoding]))
-            else:
-                value = section_name
+            regnet = regnets.Regnet(abbreviation["pattern"])
+            name = abbreviation["name"]
+            self.add_to_sequences(name, regnet, codepoint)
+
+            value = abbreviation.get(encoding, name)
             self.lookup_table[codepoint] = value
-            self.legend[section_name] = value
+            self.legend[name] = value
 
     def __getitem__(self, char):
         if self.CONTROL_CHARS_START <= ord(char) < self.CONTROL_CHARS_END:
@@ -101,19 +101,9 @@ class AbbreviationRegister(object):
         return "".join(self[char] for char in text)
 
 
-def load_rules(filename):
-    """
-    Build a config object from the provided file
-    """
-    config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),
-                                       allow_no_value=True)
-    config.read_file(filename)
-    return config
-
-
 if __name__ == "__main__":
     dir_name = path.dirname(__file__)
-    tna_filename = path.join(dir_name, "config", "tna.ini")
+    tna_filename = path.join(dir_name, "config", "tna.yml")
     # Parse command line arguments
     import argparse
     parser = argparse.ArgumentParser()
@@ -139,16 +129,17 @@ if __name__ == "__main__":
     elif args.text:
         text = " ".join(args.text)
     else:
-        exit("No input received. Run 'python3 abba.py -h' for more information.")
+        exit("No input received. Run 'python3 abbreviate.py -h' for more information.")
 
     # Get a ruleset and use it to generate an abbreviation register
+    encoding = args.render
     if args.generate:
-        abb_config = rules_generator.Generator(text).generate_rules()
+        ruleset = Generator(text).generate_rules()
     else:
-        with open(args.ruleset) as ruleset:
-            abb_config = load_rules(ruleset)
-    encoding = 'uni_rep' if args.render == 'unicode' else 'name'
-    abba = AbbreviationRegister(abb_config, encoding=encoding)
+        with open(args.ruleset, 'r') as f:
+            ruleset = yaml.safe_load(f)
+    parser = regnets.Parser(ruleset, encoding)
+    abba = AbbreviationRegister(parser.abbreviations, encoding=encoding)
 
     # Choose the rendering method
     if args.legend:

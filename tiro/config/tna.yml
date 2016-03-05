@@ -1,0 +1,178 @@
+aliases:
+   lin_low: "0332"
+   th: "00f0"
+   til: "0303"
+   wh: "2c72"
+   circ_low: "032D"
+   lin_low: "0332"
+
+abbreviations:
+  - name: FINAL S
+    pattern: s#final
+    unicode: s
+
+  - name: LONG S
+    pattern: s
+    unicode: /017f
+
+  - name: OB
+    pattern: ob
+    unicode: o/lin_low
+
+  - name: UN
+    pattern: un
+    unicode: u/lin_low
+
+  - name: R ROTUNDA
+    pattern: (?<=[bdhmnopquw])r
+    unicode: /a75b
+
+  - name: THE
+    pattern: the#iso
+    unicode: /th
+
+  - name: THIS
+    pattern: this#iso
+    unicode: /th/s
+
+  - name: THAT
+    pattern: that#iso
+    unicode: /th/t
+
+  - name: THEN
+    pattern: then#iso
+    unicode: /th/n
+
+  - name: THEM
+    pattern: them#iso
+    unicode: /th/m
+
+  - name: THERE
+    pattern: there#word
+    unicode: /th/r
+
+  - name: CAN
+    pattern: can#word
+    unicode: /00e7
+
+  - name: RSE
+    pattern: rse#suf
+
+  - name: TH
+    pattern: th
+    unicode: /th
+
+  - name: ED
+    pattern: ed#suf
+    unicode: /0333
+
+  - name: AND
+    pattern: and#iso
+    unicode: /204a
+
+  - name: WITH
+    pattern: with#iso
+
+  - name: WE
+    pattern: we#iso
+    unicode: w/til
+
+  - name: ME
+    pattern: me#iso
+    unicode: m/til
+
+  - name: US
+    pattern: us#iso
+    unicode: w/til
+
+  - name: IS
+    pattern: is#iso
+    unicode: /01c2
+
+  - name: WH
+    pattern: wh
+    unicode: /wh
+
+  - name: WHAT
+    pattern: what#iso
+    unicode: /wh/t
+
+  - name: WHERE
+    pattern: where#iso
+    unicode: /wh/r
+
+  - name: WHO
+    pattern: who#word
+    unicode: /wh/o
+
+  - name: WHEN
+    pattern: when#iso
+    unicode: /wh/n
+
+  - name: WHY
+    pattern: why#iso
+    unicode: /wh/y
+
+  - name: YOU
+    pattern: you#word
+    unicode: /1eff
+
+  - name: O_NT
+    pattern: nt#vow
+    unicode: /til
+
+  - name: O_ND
+    pattern: nd#vow
+    unicode: /036b
+
+  - name: O_NK
+    pattern: nk#vow
+    unicode: /0330
+
+  - name: O_NG
+    pattern: ng#vow
+    unicode: /032b
+
+  - name: O_CT
+    pattern: ct#vow
+    unicode: /0265
+
+  - name: OO
+    pattern: oo
+    unicode: o/0325
+
+  - name: LL
+    pattern: ll
+    unicode: /2016
+
+  - name: MEDIAL_SS
+    pattern: ss
+    unicode: /00df
+
+  - name: DI_U
+    pattern: u#vow
+    unicode: /032C
+
+  - name: DI_E
+    pattern: e#vow
+    unicode: /circ_low
+
+  - name: DI_I
+    pattern: i#vow
+    unicode: /035E
+
+  - name: SUFF_E
+    pattern: e#suf
+    unicode: /circ_low
+
+  - name: QU
+    pattern: qu#hard
+    unicode: q/0307
+
+  - name: TION
+    pattern: tion#suf
+    unicode: /0278/0304
+
+  - name: ION
+    pattern: ion#suf
+    unicode: /0278/ 

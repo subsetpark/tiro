@@ -1,7 +1,6 @@
 import collections
 import re
 import random
-import configparser
 
 
 class Generator(object):
@@ -28,26 +27,19 @@ class Generator(object):
         """
         Build a dictionary of regnet-style abbreviation definitions.
         """
-        patterns = {}
+        rules = {"abbreviations": []}
         for most_common, _ in counter:
-            patterns[name_prefix + most_common.upper()] = {
+            rules["abbreviations"].append({
+                "name": name_prefix + most_common.upper(),
                 "pattern": most_common + pattern_suffix,
-                "uni_rep": chr(next(self.symbol_pool))
-            }
-        return patterns
+                "unicode": chr(next(self.symbol_pool))
+            })
+        return rules
 
-    def generate_abbreviations(self):
+    def generate_rules(self):
+        # Build rules dictionary with most common digraphs.
         patterns = self.dict_builder(self.token_counter("\\w\\w", 15), name_prefix='_')
+        # Update rules with most common words.
         patterns.update(self.dict_builder(self.token_counter("\\w\\w+", 20),
                                           pattern_suffix="#word"))
         return patterns
-
-    def generate_rules(self):
-        """
-        Analyze a text, and construct an abbreviation list.
-        """
-        config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),
-                                           allow_no_value=True)
-
-        config.read_dict(self.generate_abbreviations())
-        return config

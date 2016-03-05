@@ -15,6 +15,8 @@ rules = [
     (re.compile("(?P<pat>\\w+)#hard"), "\g<pat>", 0)
 ]
 
+REGNET_CONTROL = "/"
+
 
 class Regnet(object):
 
@@ -43,15 +45,30 @@ class Regnet(object):
             self.pattern = re.compile(pattern, re.IGNORECASE)
 
 
-def parse_regnet(value):
-    """
-    Read the .ini formatting looking for references to unicode characters.
-    Recurse through the uni_rep, replacing codepoint references as you go.
-    """
+class Parser(object):
 
-    if '{' not in value or value[value.index('{') + 5] is not '}':
-        return ''.join(value)
-    else:
-        i = value.index('{')
-        value[i:i + 6] = chr(int('0x' + ''.join(value[i + 1:i + 5]), 16))
-        return ''.join(parse_regnet(value))
+    def __init__(self, ruleset, encoding):
+        self.aliases = ruleset.get("aliases", {})
+        self.abbreviations = ruleset.get("abbreviations", [])
+        for abbreviation in self.abbreviations:
+            value = abbreviation.get(encoding, "")
+            if value:
+                tokens = value.split(REGNET_CONTROL)
+                interpolated = [self.interpolate_token(t) for t in tokens]
+                abbreviation[encoding] = "".join(interpolated)
+
+    def interpolate_token(self, value):
+        """
+        Read the .ini formatting looking for references to unicode characters.
+        Recurse through the display value, replacing codepoint references as you
+        go.
+        """
+
+        if value in self.aliases:
+            return self.interpolate_token(self.aliases[value])
+        try:
+            # Interpolate bare codepoint references into unicode characters
+            base_16 = int(value, 16)
+            return chr(base_16)
+        except ValueError:
+            return value
